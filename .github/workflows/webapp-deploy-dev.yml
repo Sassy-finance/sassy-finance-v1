@@ -32,23 +32,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Setup NodeJS, install deps from parent folder
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'yarn'
-        
+       
       - name: Install deps, build and link ui-components
         run: |
-          cd packages/ui-components
+          cd frontend/packages/ui-components
           yarn install --pure-lockfile
           yarn build
           yarn link
     
       - name: Install deps and link web-app
         run: |
-          cd packages/web-app
+          cd frontend/packages/web-app
           yarn install --pure-lockfile
           yarn link @aragon/ui-components
 
