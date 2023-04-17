@@ -1,0 +1,17 @@
+{
+  "name": "@aragon/apps",
+  "version": "0.1.0",
+  "description": "Aragon DAO Clients",
+  "repository": "https://github.com/aragon/apps",
+  "author": "Aragon Association",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
