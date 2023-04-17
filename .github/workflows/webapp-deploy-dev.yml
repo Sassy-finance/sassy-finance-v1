@@ -34,6 +34,8 @@ jobs:
         uses: actions/checkout@v3
        
       - name: Install deps, build and link ui-components
+        with:
+          node-version: 16
         run: |
           cd frontend/packages/ui-components
           yarn install --pure-lockfile
@@ -41,12 +43,16 @@ jobs:
           yarn link
     
       - name: Install deps and link web-app
+        with:
+          node-version: 16
         run: |
           cd frontend/packages/web-app
           yarn install --pure-lockfile
           yarn link @aragon/ui-components
 
       - name: Build web-app
+        with:
+          node-version: 16
         run: |
           cd packages/web-app 
           yarn build
@@ -90,7 +96,7 @@ jobs:
       - name: Build Docker image from scratch
         run: |
           mkdir -p /tmp/docker-build-push-${{ steps.vars.outputs.DATE_IN_SECS }}/
-          docker buildx build . --file ./Dockerfile.webapp.dev --push \
+          docker buildx build . --file ./frontend/Dockerfile.webapp.dev --push \
           --build-arg NODE_OPTIONS='--max-old-space-size=6656' \
           --tag ialberquilla/sassy-frontend
 
