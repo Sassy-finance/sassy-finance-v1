@@ -32,10 +32,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-       
-      - name: Install deps, build and link ui-components
+
+      - name: Setup NodeJS, install deps from parent folder
+        uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: 'yarn'
+          cache-dependency-path: ./frontend/yarn.lock
+        
+      - name: Install deps, build and link ui-components
         run: |
           cd frontend/packages/ui-components
           yarn install --pure-lockfile
@@ -43,18 +48,14 @@ jobs:
           yarn link
     
       - name: Install deps and link web-app
-        with:
-          node-version: 16
         run: |
           cd frontend/packages/web-app
           yarn install --pure-lockfile
           yarn link @aragon/ui-components
 
       - name: Build web-app
-        with:
-          node-version: 16
         run: |
-          cd packages/web-app 
+          cd frontend/packages/web-app 
           yarn build
         env:
           VITE_REACT_APP_DEPLOY_VERSION: ${{ github.sha }}
