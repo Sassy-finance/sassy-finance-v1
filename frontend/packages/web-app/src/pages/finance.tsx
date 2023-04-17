@@ -4,7 +4,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
-
+import PieChart from 'components/pieChart';
 import {Loading} from 'components/temporary/loading';
 import TokenList from 'components/tokenList';
 import TransferList from 'components/transferList';
@@ -108,10 +108,15 @@ const Finance: React.FC = () => {
       }
     >
       <div className={'h-4'} />
-      <TokenSectionWrapper title={t('finance.tokenSection')}>
-        <ListContainer>
-          <TokenList tokens={tokens.slice(0, 5)} />
-        </ListContainer>
+      <TokenSectionWrapper title={"Overview"}>
+        <div className="grid grid-cols-2 gap-4">
+          <ListContainer>
+            <PieChart/>
+          </ListContainer>
+          <ListContainer>
+            <TokenList tokens={tokens.slice(0, 5)} />
+          </ListContainer>
+        </div>
       </TokenSectionWrapper>
       <div className={'h-4'} />
       <TransferSectionWrapper title={t('finance.transferSection')} showButton>
@@ -142,13 +147,13 @@ const SubtitleContainer = styled.div.attrs({
 })``;
 
 const Header = styled.div.attrs({
-  className: `p-2 desktop:p-0 pb-3 desktop:mt-5 space-y-2 tablet:space-y-3 
+  className: `p-2 desktop:p-0 pb-3 desktop:mt-5 space-y-2 tablet:space-y-3
    bg-ui-0 desktop:bg-transparent tablet:rounded-xl tablet:border
    tablet:border-ui-100 desktop:border-none tablet:shadow-100 desktop:shadow-none`,
 })``;
 
 const ContentContainer = styled.div.attrs({
-  className: `flex flex-col tablet:flex-row tablet:gap-x-6 gap-y-2 
+  className: `flex flex-col tablet:flex-row tablet:gap-x-6 gap-y-2
      tablet: gap - y - 3 tablet: items - start desktop: items - center`,
 })``;
 
