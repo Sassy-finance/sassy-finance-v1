@@ -39,14 +39,14 @@ const MobileNavMenu = (props: MobileNavMenuProps) => {
         <div className="py-3 px-2 space-y-3">
           <NavLinks onItemClick={() => close('mobileMenu')} />
 
-          <ButtonText
+          {/* <ButtonText
             className="w-full"
             size="large"
             label={t('navButtons.giveFeedback')}
             mode="secondary"
             iconRight={<IconFeedback />}
             onClick={props.onFeedbackClick}
-          />
+          /> */}
         </div>
       </div>
     </BottomSheet>

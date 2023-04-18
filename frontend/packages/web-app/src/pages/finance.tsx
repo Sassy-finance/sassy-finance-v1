@@ -92,6 +92,18 @@ const Finance: React.FC = () => {
               {/* Button */}
               <ButtonText
                 size="large"
+                label={t('TransferModal.createStrategy')}
+                iconLeft={<IconAdd />}
+                className="w-full tablet:w-auto"
+                onClick={() => {
+                  trackEvent('finance_newTransferBtn_clicked', {
+                    dao_address: daoId,
+                  });
+                  open('strategy');
+                }}
+              />
+              <ButtonText
+                size="large"
                 label={t('TransferModal.newTransfer')}
                 iconLeft={<IconAdd />}
                 className="w-full tablet:w-auto"

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'packages/web-app/**'
+      - 'frontend/packages/web-app/**'
       - '!.github/**'
     branches:
       - 'main'
