@@ -1,4 +1,4 @@
-import React, {lazy, Suspense, useEffect} from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 
 // FIXME: Change route to ApmRoute once package has been updated to be
 // compatible with react-router-dom v6
@@ -12,29 +12,30 @@ import {
 } from 'react-router-dom';
 
 import Navbar from 'containers/navbar';
-import {WalletMenu} from 'containers/walletMenu';
-import {identifyUser, trackPage} from 'services/analytics';
+import { WalletMenu } from 'containers/walletMenu';
+import { identifyUser, trackPage } from 'services/analytics';
 import '../i18n.config';
 
 // HACK: All pages MUST be exported with the withTransaction function
 // from the '@elastic/apm-rum-react' package in order for analytics to
 // work properly on the pages.
-import {GridLayout} from 'components/layout';
-import {Loading} from 'components/temporary/loading';
+import { GridLayout } from 'components/layout';
+import { Loading } from 'components/temporary/loading';
 import ExploreFooter from 'containers/exploreFooter';
 import DaoSelectMenu from 'containers/navbar/daoSelectMenu';
 import ExploreNav from 'containers/navbar/exploreNav';
 import NetworkErrorMenu from 'containers/networkErrorMenu';
 import TransactionDetail from 'containers/transactionDetail';
 import TransferMenu from 'containers/transferMenu';
-import {ProposalTransactionProvider} from 'context/proposalTransaction';
-import {useDaoDetails} from 'hooks/useDaoDetails';
-import {useWallet} from 'hooks/useWallet';
+import StrategyMenu from 'containers/strategyMenu';
+import { ProposalTransactionProvider } from 'context/proposalTransaction';
+import { useDaoDetails } from 'hooks/useDaoDetails';
+import { useWallet } from 'hooks/useWallet';
 import CreateDAO from 'pages/createDAO';
-import {FormProvider, useForm} from 'react-hook-form';
-import {NotFound} from 'utils/paths';
+import { FormProvider, useForm } from 'react-hook-form';
+import { NewManualStrategy, NotFound } from 'utils/paths';
 import ProtectedRoute from 'components/protectedRoute';
-import {useTransactionDetailContext} from 'context/transactionDetail';
+import { useTransactionDetailContext } from 'context/transactionDetail';
 import Footer from 'containers/footer';
 
 const DemoSCCPage = lazy(() => import('pages/demoScc'));
@@ -53,6 +54,7 @@ const TokensPage = lazy(() => import('pages/tokens'));
 const TransfersPage = lazy(() => import('pages/transfers'));
 const NewDepositPage = lazy(() => import('pages/newDeposit'));
 const NewWithdrawPage = lazy(() => import('pages/newWithdraw'));
+const NewManualStrategyPage = lazy(() => import('pages/newManualStrategy'));
 
 const NewProposalPage = lazy(() => import('pages/newProposal'));
 const ProposalPage = lazy(() => import('pages/proposal'));
@@ -63,8 +65,8 @@ const ManageMembersProposalPage = lazy(() => import('pages/manageMembers'));
 function App() {
   // TODO this needs to be inside a Routes component. Will be moved there with
   // further refactoring of layout (see further below).
-  const {pathname} = useLocation();
-  const {methods, status, network, address, provider} = useWallet();
+  const { pathname } = useLocation();
+  const { methods, status, network, address, provider } = useWallet();
 
   useEffect(() => {
     if (status === 'connected') {
@@ -113,6 +115,10 @@ function App() {
                   element={<NewWithdrawPage />}
                 />
                 <Route
+                  path="finance/new-manual-strategy"
+                  element={<NewManualStrategyPage />}
+                />
+                <Route
                   path="governance/new-proposal"
                   element={<NewProposalPage />}
                 />
@@ -158,7 +164,7 @@ const NewSettingsWrapper: React.FC = () => {
   const formMethods = useForm({
     mode: 'onChange',
     defaultValues: {
-      links: [{name: '', url: ''}],
+      links: [{ name: '', url: '' }],
       startSwitch: 'now',
       durationSwitch: 'duration',
       durationDays: '1',
@@ -181,9 +187,9 @@ const ProposalDetailsWrapper: React.FC = () => (
 );
 
 const NotFoundWrapper: React.FC = () => {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
 
-  return <Navigate to={NotFound} state={{incorrectPath: pathname}} replace />;
+  return <Navigate to={NotFound} state={{ incorrectPath: pathname }} replace />;
 };
 
 const ExploreWrapper: React.FC = () => (
@@ -197,13 +203,13 @@ const ExploreWrapper: React.FC = () => (
 );
 
 const DaoWrapper: React.FC = () => {
-  const {dao} = useParams();
-  const {data: daoDetails} = useDaoDetails(dao!);
+  const { dao } = useParams();
+  const { data: daoDetails } = useDaoDetails(dao!);
 
   // using isOpen to conditionally render TransactionDetail so that
   // api call is not made on mount regardless of whether the user
   // wants to open the modal
-  const {isOpen} = useTransactionDetailContext();
+  const { isOpen } = useTransactionDetailContext();
 
   return (
     <>
@@ -212,6 +218,7 @@ const DaoWrapper: React.FC = () => {
         <GridLayout>
           <Outlet />
           <TransferMenu />
+          <StrategyMenu />
           {daoDetails && isOpen && (
             <TransactionDetail
               daoAddress={daoDetails.address}

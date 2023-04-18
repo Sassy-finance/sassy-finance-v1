@@ -102,14 +102,14 @@ const DesktopNav: React.FC<DesktopNavProp> = props => {
         </Content>
 
         <div className="flex gap-2">
-          <ButtonText
+          {/* <ButtonText
             className="w-full tablet:w-max"
             size="large"
             label={t('navButtons.giveFeedback')}
             mode="secondary"
             iconRight={<IconFeedback />}
             onClick={props.onFeedbackClick}
-          />
+          /> */}
 
           <ButtonWallet
             src={ensAvatarUrl || address}

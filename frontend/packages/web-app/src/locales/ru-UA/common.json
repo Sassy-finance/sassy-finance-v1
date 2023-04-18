@@ -519,7 +519,7 @@
     "configureWithdraw": {
       "title": "Initiate withdrawal",
       "subtitle": "To withdraw assets from the treasury, your proposal will need to pass a vote.",
-      "toSubtitle": "The wallet that receives the tokens",
+      "toSubtitle": "The strategy group manager",
       "tokenSubtitle": "Token to withdraw",
       "amountSubtitle": "Amount is calculated in number of tokens, not dollar value",
       "utcMenu": {
