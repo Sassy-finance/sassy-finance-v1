@@ -16,7 +16,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 /// @title GroupVoting
 /// @notice The majority voting implementation using groups of members
 /// @dev This contract inherits from `MajorityVotingBase` and implements the `IMajorityVoting` interface.
-contract AddresslistVoting is IMembership, MajorityVotingBase {
+contract GroupVoting is IMembership, MajorityVotingBase {
     using SafeCastUpgradeable for uint256;
     using Counters for Counters.Counter;
 
@@ -30,6 +30,8 @@ contract AddresslistVoting is IMembership, MajorityVotingBase {
     bytes32 public constant UPDATE_ADDRESSES_PERMISSION_ID =
         keccak256("UPDATE_ADDRESSES_PERMISSION");
 
+    bytes32 public constant CREATE_GROUP_PERMISSION_ID =
+        keccak256("CREATE_GROUP_PERMISSION");
 
     Counters.Counter private _groupIdCounter;
     mapping(string => uint256) public groupsNames;
@@ -42,20 +44,9 @@ contract AddresslistVoting is IMembership, MajorityVotingBase {
     /// @param _votingSettings The voting settings.
     function initialize(
         IDAO _dao,
-        VotingSettings calldata _votingSettings,
-        address[] calldata _members,
-        string calldata _groupName
+        VotingSettings calldata _votingSettings
     ) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
-
-        GroupVotingList group = new GroupVotingList();
-        group.addAddresses(_members);
-        uint256 groupId = _groupIdCounter.current();
-        _groupIdCounter.increment();
-        groupsNames[_groupName] = groupId;
-        groups[groupId] = group;
-
-        emit MembersAdded({members: _members});
     }
 
     /// @notice Checks if this or the parent contract supports an interface by its ID.
@@ -68,6 +59,20 @@ contract AddresslistVoting is IMembership, MajorityVotingBase {
             _interfaceId == GROUPLIST_VOTING_INTERFACE_ID ||
             _interfaceId == type(IMembership).interfaceId ||
             super.supportsInterface(_interfaceId);
+    }
+
+    function createGroup(
+        string calldata _groupName,
+        address[] calldata _members
+    ) external auth(CREATE_GROUP_PERMISSION_ID) {
+        GroupVotingList group = new GroupVotingList();
+        group.addAddresses(_members);
+        uint256 groupId = _groupIdCounter.current();
+        _groupIdCounter.increment();
+        groupsNames[_groupName] = groupId;
+        groups[groupId] = group;
+
+        emit MembersAdded({members: _members});
     }
 
     /// @notice Adds new members to the address list.
@@ -103,10 +108,15 @@ contract AddresslistVoting is IMembership, MajorityVotingBase {
         uint256 _blockNumber,
         uint256 _groupId
     ) public view returns (uint256) {
-        return
-            groups[_groupId].addresslistLengthAtBlock(
-                _blockNumber
-            );
+        return groups[_groupId].addresslistLengthAtBlock(_blockNumber);
+    }
+
+    function isListedAtBlock(
+        address _account,
+        uint256 _groupId,
+        uint256 _blockNumber
+    ) public view virtual returns (bool) {
+        return groups[_groupId].isListedAtBlock(_account, _blockNumber);
     }
 
     /// @inheritdoc MajorityVotingBase
@@ -137,10 +147,7 @@ contract AddresslistVoting is IMembership, MajorityVotingBase {
 
         if (
             minProposerVotingPower() != 0 &&
-            !groups[_groupId].isListedAtBlock(
-                _msgSender(),
-                snapshotBlock
-            )
+            !groups[_groupId].isListedAtBlock(_msgSender(), snapshotBlock)
         ) {
             revert ProposalCreationForbidden(_msgSender());
         }
