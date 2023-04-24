@@ -8,24 +8,33 @@ import {IDAO} from "@aragon/osx/core/dao/IDAO.sol";
 import {RATIO_BASE, _applyRatioCeiled} from "@aragon/osx/plugins/utils/Ratio.sol";
 
 import {IMembership} from "@aragon/osx/core/plugin/membership/IMembership.sol";
-import {Addresslist} from "@aragon/osx/plugins/utils/Addresslist.sol";
 import {IMajorityVoting} from "@aragon/osx/plugins/governance/majority-voting/IMajorityVoting.sol";
 import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
- 
-/// @title AddresslistVoting
-/// @author Aragon Association - 2021-2023.
-/// @notice The majority voting implementation using an list of member addresses.
+import {GroupVotingList} from "./GroupVotingList.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+/// @title GroupVoting
+/// @notice The majority voting implementation using groups of members
 /// @dev This contract inherits from `MajorityVotingBase` and implements the `IMajorityVoting` interface.
-contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
+contract AddresslistVoting is IMembership, MajorityVotingBase {
     using SafeCastUpgradeable for uint256;
+    using Counters for Counters.Counter;
 
     /// @notice The [ERC-165](https://eips.ethereum.org/EIPS/eip-165) interface ID of the contract.
-    bytes4 internal constant ADDRESSLIST_VOTING_INTERFACE_ID =
-        this.initialize.selector ^ this.addAddresses.selector ^ this.removeAddresses.selector;
+    bytes4 internal constant GROUPLIST_VOTING_INTERFACE_ID =
+        this.initialize.selector ^
+            this.addAddresses.selector ^
+            this.removeAddresses.selector;
 
     /// @notice The ID of the permission required to call the `addAddresses` and `removeAddresses` functions.
     bytes32 public constant UPDATE_ADDRESSES_PERMISSION_ID =
         keccak256("UPDATE_ADDRESSES_PERMISSION");
+
+
+    Counters.Counter private _groupIdCounter;
+    mapping(string => uint256) public groupsNames;
+    mapping(uint256 => GroupVotingList) public groups;
+    mapping(uint256 => uint256) public proposalGroup;
 
     /// @notice Initializes the component.
     /// @dev This method is required to support [ERC-1822](https://eips.ethereum.org/EIPS/eip-1822).
@@ -34,21 +43,29 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
     function initialize(
         IDAO _dao,
         VotingSettings calldata _votingSettings,
-        address[] calldata _members
+        address[] calldata _members,
+        string calldata _groupName
     ) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
 
-        _addAddresses(_members);
+        GroupVotingList group = new GroupVotingList();
+        group.addAddresses(_members);
+        uint256 groupId = _groupIdCounter.current();
+        _groupIdCounter.increment();
+        groupsNames[_groupName] = groupId;
+        groups[groupId] = group;
+
         emit MembersAdded({members: _members});
     }
 
     /// @notice Checks if this or the parent contract supports an interface by its ID.
     /// @param _interfaceId The ID of the interface.
     /// @return Returns `true` if the interface is supported.
-    function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
+    function supportsInterface(
+        bytes4 _interfaceId
+    ) public view virtual override returns (bool) {
         return
-            _interfaceId == ADDRESSLIST_VOTING_INTERFACE_ID ||
-            _interfaceId == type(Addresslist).interfaceId ||
+            _interfaceId == GROUPLIST_VOTING_INTERFACE_ID ||
             _interfaceId == type(IMembership).interfaceId ||
             super.supportsInterface(_interfaceId);
     }
@@ -57,9 +74,10 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
     /// @param _members The addresses of members to be added.
     /// @dev This function is used during the plugin initialization.
     function addAddresses(
-        address[] calldata _members
+        address[] calldata _members,
+        uint256 _groupId
     ) external auth(UPDATE_ADDRESSES_PERMISSION_ID) {
-        _addAddresses(_members);
+        groups[_groupId].addAddresses(_members);
 
         emit MembersAdded({members: _members});
     }
@@ -67,16 +85,28 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
     /// @notice Removes existing members from the address list.
     /// @param _members The addresses of the members to be removed.
     function removeAddresses(
-        address[] calldata _members
+        address[] calldata _members,
+        uint256 _groupId
     ) external auth(UPDATE_ADDRESSES_PERMISSION_ID) {
-        _removeAddresses(_members);
+        groups[_groupId].removeAddresses(_members);
 
         emit MembersRemoved({members: _members});
     }
 
     /// @inheritdoc MajorityVotingBase
-    function totalVotingPower(uint256 _blockNumber) public view override returns (uint256) {
-        return addresslistLengthAtBlock(_blockNumber);
+
+    function totalVotingPower(
+        uint256 _blockNumber
+    ) public view override returns (uint256) {}
+
+    function totalVotingPower(
+        uint256 _blockNumber,
+        uint256 _groupId
+    ) public view returns (uint256) {
+        return
+            groups[_groupId].addresslistLengthAtBlock(
+                _blockNumber
+            );
     }
 
     /// @inheritdoc MajorityVotingBase
@@ -88,13 +118,30 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
         uint64 _endDate,
         VoteOption _voteOption,
         bool _tryEarlyExecution
-    ) external override returns (uint256 proposalId) {
+    ) external override returns (uint256 proposalId) {}
+
+    function createProposal(
+        bytes calldata _metadata,
+        IDAO.Action[] calldata _actions,
+        uint256 _allowFailureMap,
+        uint64 _startDate,
+        uint64 _endDate,
+        VoteOption _voteOption,
+        bool _tryEarlyExecution,
+        uint256 _groupId
+    ) external returns (uint256 proposalId) {
         uint64 snapshotBlock;
         unchecked {
             snapshotBlock = block.number.toUint64() - 1;
         }
 
-        if (minProposerVotingPower() != 0 && !isListedAtBlock(_msgSender(), snapshotBlock)) {
+        if (
+            minProposerVotingPower() != 0 &&
+            !groups[_groupId].isListedAtBlock(
+                _msgSender(),
+                snapshotBlock
+            )
+        ) {
             revert ProposalCreationForbidden(_msgSender());
         }
 
@@ -110,10 +157,12 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
         // Store proposal related information
         Proposal storage proposal_ = proposals[proposalId];
 
-        (proposal_.parameters.startDate, proposal_.parameters.endDate) = _validateProposalDates({
-            _start: _startDate,
-            _end: _endDate
-        });
+        proposalGroup[proposalId] = _groupId;
+
+        (
+            proposal_.parameters.startDate,
+            proposal_.parameters.endDate
+        ) = _validateProposalDates({_start: _startDate, _end: _endDate});
         proposal_.parameters.snapshotBlock = snapshotBlock;
         proposal_.parameters.votingMode = votingMode();
         proposal_.parameters.supportThreshold = supportThreshold();
@@ -139,10 +188,15 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
         }
     }
 
-    /// @inheritdoc IMembership
-    function isMember(address _account) external view returns (bool) {
-        return isListed(_account);
+    function isMember(
+        address _account,
+        uint256 _groupId
+    ) external view returns (bool) {
+        return groups[_groupId].isListed(_account);
     }
+
+    /// @inheritdoc IMembership
+    function isMember(address _account) external view returns (bool) {}
 
     /// @inheritdoc MajorityVotingBase
     function _vote(
@@ -206,7 +260,12 @@ contract AddresslistVoting is IMembership, Addresslist, MajorityVotingBase {
         }
 
         // The voter has no voting power.
-        if (!isListedAtBlock(_account, proposal_.parameters.snapshotBlock)) {
+        if (
+            !groups[proposalGroup[_proposalId]].isListedAtBlock(
+                _account,
+                proposal_.parameters.snapshotBlock
+            )
+        ) {
             return false;
         }
 
