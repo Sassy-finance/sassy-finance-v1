@@ -11,6 +11,7 @@ import {IMembership} from "@aragon/osx/core/plugin/membership/IMembership.sol";
 import {IMajorityVoting} from "@aragon/osx/plugins/governance/majority-voting/IMajorityVoting.sol";
 import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
 import {GroupVotingList} from "./GroupVotingList.sol";
+import {Vault} from "./Vault.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 /// @title GroupVoting
@@ -36,6 +37,7 @@ contract GroupVoting is IMembership, MajorityVotingBase {
     Counters.Counter private _groupIdCounter;
     mapping(string => uint256) public groupsNames;
     mapping(uint256 => GroupVotingList) public groups;
+    mapping(uint256 => Vault) public groupVault;
     mapping(uint256 => uint256) public proposalGroup;
 
     /// @notice Initializes the component.
@@ -49,28 +51,21 @@ contract GroupVoting is IMembership, MajorityVotingBase {
         __MajorityVotingBase_init(_dao, _votingSettings);
     }
 
-    /// @notice Checks if this or the parent contract supports an interface by its ID.
-    /// @param _interfaceId The ID of the interface.
-    /// @return Returns `true` if the interface is supported.
-    function supportsInterface(
-        bytes4 _interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            _interfaceId == GROUPLIST_VOTING_INTERFACE_ID ||
-            _interfaceId == type(IMembership).interfaceId ||
-            super.supportsInterface(_interfaceId);
-    }
-
     function createGroup(
         string calldata _groupName,
         address[] calldata _members
     ) external auth(CREATE_GROUP_PERMISSION_ID) {
-        GroupVotingList group = new GroupVotingList();
-        group.addAddresses(_members);
         uint256 groupId = _groupIdCounter.current();
         _groupIdCounter.increment();
+
+        GroupVotingList group = new GroupVotingList();
+        group.addAddresses(_members);
+
         groupsNames[_groupName] = groupId;
         groups[groupId] = group;
+
+        Vault vault = new Vault();
+        groupVault[groupId] = vault;
 
         emit MembersAdded({members: _members});
     }
@@ -198,7 +193,7 @@ contract GroupVoting is IMembership, MajorityVotingBase {
     function isMember(
         address _account,
         uint256 _groupId
-    ) external view returns (bool) {
+    ) public view returns (bool) {
         return groups[_groupId].isListed(_account);
     }
 
@@ -285,6 +280,34 @@ contract GroupVoting is IMembership, MajorityVotingBase {
         }
 
         return true;
+    }
+
+    function withdrawNFT(
+        address _tokenAddress,
+        uint256 _tokenId,
+        address _destination,
+        uint256 _groupId
+    ) external {
+        require(isMember(_msgSender(), _groupId), "Not a group member");
+        groupVault[_groupId].withdrawNFT(_tokenAddress, _tokenId, _destination);
+    }
+
+    function withdrawERC20(
+        address _tokenAddress,
+        uint256 _amount,
+        address _destination,
+        uint256 _groupId
+    ) external {
+        require(isMember(_msgSender(), _groupId), "Not a group member");
+        groupVault[_groupId].withdrawERC20(
+            _tokenAddress,
+            _amount,
+            _destination
+        );
+    }
+
+    function getGroupVault(uint256 _groupId) external view returns (address) {
+        return address(groupVault[_groupId]);
     }
 
     /// @dev This empty reserved space is put in place to allow future versions to add new
