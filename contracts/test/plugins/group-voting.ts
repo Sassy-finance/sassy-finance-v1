@@ -23,18 +23,17 @@ describe('Group voting plugin', function () {
     let groupVotingFactoryBytecode: any;
     let mergedAbi: any;
     let votingSettings: any;
-    let paymentRecipient: any;
     let voting: any;
     let startDate: number;
-    let endDate: number;
     const startOffset = 10;
     let dummyActions: any;
     let dummyMetadata: string;
+    let mockToken: any;
+    let endDate: any
 
     before(async () => {
         signers = await ethers.getSigners();
         ownerAddress = await signers[0].getAddress();
-        paymentRecipient = signers[1];
 
         ({ abi: mergedAbi, bytecode: groupVotingFactoryBytecode } = await getMergedABI(
             // @ts-ignore
@@ -44,6 +43,9 @@ describe('Group voting plugin', function () {
         ));
 
         dao = await deployNewDAO(ownerAddress);
+
+        const MockToken = await ethers.getContractFactory("MockToken");
+        mockToken = await MockToken.deploy("Test Token", "TESTUSD", 100000000);
 
         dummyActions = [
             {
@@ -333,5 +335,54 @@ describe('Group voting plugin', function () {
                 .to.be.revertedWithCustomError(voting, 'VoteCastForbidden')
 
         })
+    })
+
+    describe('Funds managemenet', async () => {
+        it('Shoul allow only members to withdraw', async () => {
+            votingSettings.minProposerVotingPower = 1;
+
+            await voting.initialize(
+                dao.address,
+                votingSettings,
+            );
+
+            const allowedAddress = await signers[0].getAddress()
+            const notAllowedAddress = await signers[1].getAddress()
+            const destinationAddress = await signers[2].getAddress()
+
+            await voting.createGroup("NFT collectors", [allowedAddress])
+
+            const groupVaultAddress = await voting.getGroupVault(0)
+
+            await mockToken.transfer(groupVaultAddress, 1000000)
+
+            await dao.grant(
+                groupVaultAddress,
+                voting.address,
+                ethers.utils.id('WITHDRAW_ERC20_PERMISSION')
+            );
+
+            await dao.grant(
+                groupVaultAddress,
+                signers[0].address,
+                ethers.utils.id('WITHDRAW_ERC20_PERMISSION')
+            );
+
+            await expect(
+                voting
+                    .connect(signers[1])
+                    .withdrawERC20(mockToken.address, 100, destinationAddress, 0)
+            )
+                .to.be.revertedWith('Not a group member')
+
+            await voting
+                .connect(signers[0])
+                .withdrawERC20(mockToken.address, 100, destinationAddress, 0)
+
+            expect(
+                await mockToken.balanceOf(destinationAddress)
+            ).to.be.equals(100)
+
+        });
     })
 })
