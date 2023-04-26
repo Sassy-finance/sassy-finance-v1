@@ -36,14 +36,14 @@ const Footer: React.FC = () => {
             {isDesktop ? (
               <>
                 <FlexDiv>
-                  <LogoContainer src={IconLogo} />
-                  <StyledNavList>{ExploreNavLinks}</StyledNavList>
+                  {/* <LogoContainer src={IconLogo} /> */}
+                  {/* <StyledNavList>{ExploreNavLinks}</StyledNavList> */}
                 </FlexDiv>
                 <FlexDiv>
-                  <StyledNavList>{PrivacyNavLinks}</StyledNavList>
+                  {/* <StyledNavList>{PrivacyNavLinks}</StyledNavList>
                   <Copyright>
                     &copy;{`  ${new Date().getFullYear()}  `}Aragon
-                  </Copyright>
+                  </Copyright> */}
                 </FlexDiv>
               </>
             ) : (
@@ -59,9 +59,9 @@ const Footer: React.FC = () => {
           </ActionContainer>
         </FullSpan>
       </GridLayout>
-      <div className="flex z-10 justify-center items-center py-0.5 space-x-1 text-sm text-ui-0 bg-primary-400">
+      <div className="flex z-10 justify-center items-center py-0.5 space-x-1 text-sm text-ui-0 bg-purple-800">
         <IconInfo />
-        <span>Aragon App Public Beta</span>
+        <span>Sassy Finance Public Beta</span>
       </div>
     </Section>
   );
@@ -74,7 +74,7 @@ const FullSpan = styled.div.attrs({
 `;
 
 const Section = styled.section.attrs({
-  className: 'w-full bg-primary-400 overflow-hidden',
+  className: 'w-full bg-purple-800 overflow-hidden',
 })``;
 
 const ActionContainer = styled.div.attrs({

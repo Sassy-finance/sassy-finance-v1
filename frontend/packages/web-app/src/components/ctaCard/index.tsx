@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {ButtonText} from '@aragon/ui-components';
+import { ButtonText } from '@aragon/ui-components';
 import useScreen from 'hooks/useScreen';
 
 type Props = {
@@ -13,20 +13,26 @@ type Props = {
   onClick: (path: string) => void;
   subtitle: string;
   title: string;
+  bulletOne?: string,
+  bulletTwo?: string
 };
 
 const CTACard: React.FC<Props> = props => {
-  const {isDesktop} = useScreen();
+  const { isDesktop } = useScreen();
 
   return (
     <CTACardWrapper className={props.className}>
       <Content>
         <StyledImg src={props.imgSrc} />
         <Title>{props.title}</Title>
-        <Subtitle>{props.subtitle}</Subtitle>
+        <Bullets>
+          <li>{props.bulletOne}</li>
+          <li>{props.bulletTwo}</li>
+        </Bullets>
+
       </Content>
 
-      <ButtonText
+      {/* <ButtonText
         size="large"
         label={props.actionLabel}
         {...(props.actionAvailable
@@ -34,7 +40,7 @@ const CTACard: React.FC<Props> = props => {
           : {mode: 'ghost', disabled: true})}
         onClick={() => props.onClick(props.path)}
         className={`${!isDesktop && 'w-full'}`}
-      />
+      /> */}
     </CTACardWrapper>
   );
 };
@@ -57,8 +63,8 @@ const Title = styled.p.attrs({
   className: 'ft-text-2xl font-bold text-ui-800 desktop:mt-2 mt-0',
 })``;
 
-const Subtitle = styled.p.attrs({
-  className: 'text-ui-600 h-9 ft-text-base desktop:mt-2 mt-1.5',
+const Bullets = styled.p.attrs({
+  className: 'text-ui-600 h-9 ft-text-base desktop:mt-2 mt-1.5 list-disc pl-3',
 })``;
 
 const StyledImg = styled.img.attrs({

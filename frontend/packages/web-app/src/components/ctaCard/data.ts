@@ -14,6 +14,8 @@ const CTACards = [
     imgSrc: createDaoImg,
     subtitle: i18n.t('cta.create.description'),
     title: i18n.t('cta.create.title'),
+    bulletOne: i18n.t('cta.create.bullet.one'),
+    bulletTwo: i18n.t('cta.create.bullet.two')
   },
   {
     actionAvailable: true,
@@ -22,6 +24,8 @@ const CTACards = [
     imgSrc: learnImg,
     subtitle: i18n.t('cta.learn.description'),
     title: i18n.t('cta.learn.title'),
+    bulletOne: i18n.t('cta.learn.bullet.one'),
+    bulletTwo: i18n.t('cta.learn.bullet.two')
   },
   {
     actionAvailable: false,
@@ -30,6 +34,8 @@ const CTACards = [
     imgSrc: buildFaster,
     subtitle: i18n.t('cta.build.description'),
     title: i18n.t('cta.build.title'),
+    bulletOne: i18n.t('cta.build.bullet.one'),
+    bulletTwo: i18n.t('cta.build.bullet.two')
   },
 ];
 
