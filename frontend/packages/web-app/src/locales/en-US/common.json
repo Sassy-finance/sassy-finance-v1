@@ -306,7 +306,7 @@
     "noAddresses": "No address Found"
   },
   "TransactionModal": {
-    "approveSubtitle": "To sign your first transaction, you must approve Aragon App to make a transaction with your token.",
+    "approveSubtitle": "To sign your first transaction, you must approve Sassy Finance to make a transaction with your token.",
     "approveToken": "Approve token",
     "depositTitle": "Sign Deposit",
     "dismiss": "Dismiss",
@@ -520,12 +520,12 @@
   },
   "explore": {
     "hero": {
-      "title": "EXPLORE THE DAO WORLD",
+      "title": "One Click Investment DAOs",
       "subtitle1": "Welcome to the Aragon Explore Portal.",
       "subtitle2": "Take a look to the ecosystem,find inspiration and learn."
     },
     "explorer": {
-      "title": "Explore DAOs",
+      "title": "Join an existing DAO",
       "myDaos": "My DAOs",
       "popular": "Popular",
       "newest": "Newest",

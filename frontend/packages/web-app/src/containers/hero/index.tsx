@@ -17,7 +17,7 @@ function Hero() {
             <Subtitle>{t('explore.hero.subtitle1')}</Subtitle>
           </ContentWrapper>
           <ImageWrapper>
-            <StyledImage src={Logo} />
+            {/* <StyledImage src={Logo} /> */}
           </ImageWrapper>
           <GradientContainer>
             <GradientWrapper>
@@ -38,7 +38,7 @@ function Hero() {
 // desktop.
 const Container = styled.div.attrs({
   className:
-    'bg-primary-400 h-56 -mt-10 pt-10  desktop:h-67 desktop:pt-12 desktop:-mt-12 overflow-hidden',
+    'bg-purple-800 h-56 -mt-10 pt-10  desktop:h-67 desktop:pt-12 desktop:-mt-12 overflow-hidden',
 })``;
 
 const Wrapper = styled.div.attrs({

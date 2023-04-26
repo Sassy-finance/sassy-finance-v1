@@ -484,7 +484,7 @@
     "noAddresses": "No address found"
   },
   "TransactionModal": {
-    "approveSubtitle": "To sign your first transaction, you must approve Aragon App in your wallet.",
+    "approveSubtitle": "To sign your first transaction, you must approve Sassy Finance in your wallet.",
     "approveToken": "Approve token",
     "depositTitle": "Sign deposit",
     "goToFinance": "Go to Finance",
@@ -691,7 +691,7 @@
       "walletMemberShipSubtitle": "Allowlist wallet addresses of trusted members, so voting is 1 wallet = 1 vote. Allowlisted wallets can also create proposals. ",
       "nameSubtitle": "The full name of the token. Example: Uniswap",
       "symbolSubtitle": "The abbreviation of the token. Example: UNI",
-      "addExistingTokenHelptext": "We don't currently support existing tokens in Aragon App. ",
+      "addExistingTokenHelptext": "We don't currently support existing tokens in Sassy Finance. ",
       "tokenHelptextLink": "token distribution guide",
       "tokenContractSubtitlePart1": "Copy the contract address directly from the ",
       "tokenContractSubtitlePart2": "This way you can ensure that the address is correct.",
@@ -854,11 +854,11 @@
   },
   "explore": {
     "hero": {
-      "title": "Explore the DAO World",
-      "subtitle1": "Build your DAO, explore communities, and find inspiration for your project all in one place."
+      "title": "One Click Investment DAOs",
+      "subtitle1": ""
     },
     "explorer": {
-      "title": "Explore DAOs",
+      "title": "Join an existing DAO",
       "myDaos": "My DAOs",
       "popular": "Popular",
       "newest": "Newest",
@@ -874,7 +874,7 @@
     },
     "statistics": {
       "daosCreated": "DAOs created",
-      "aragonMembers": "Members in Aragon App DAOs",
+      "aragonMembers": "Members in Sassy Finance DAOs",
       "activeProposals": "Active proposals",
       "securedByAragon": "Secured by Aragon OSx"
     }
@@ -905,19 +905,31 @@
   },
   "cta": {
     "create": {
-      "title": "Create your DAO",
+      "title": "Pick & Choose",
       "description": "Mint tokens, set governance parameters, and deploy your DAO on-chain in minutes with our no-code setup process.",
-      "actionLabel": "Create a DAO"
+      "actionLabel": "Create a DAO",
+      "bullet": {
+        "one": "Custom functionality",
+        "two": "Built for your mission "
+      }
     },
     "learn": {
-      "title": "Learn about DAOs",
+      "title": "Advance Defi tools",
       "description": "Find inspiration and learn about DAOs in our education portal designed for builders at every stage of the journey.",
-      "actionLabel": "Learn about DAOs"
+      "actionLabel": "Learn about DAOs",
+      "bullet": {
+        "one": "Automatic trading",
+        "two": "NFTs, Crypto and Lending"
+      }
     },
     "build": {
-      "title": "Build faster",
+      "title": "Compliant",
       "description": "Use our governance plugins to build a DAO, dApp, or anything you can imagine on the Aragon OSx protocol.",
-      "actionLabel": "Coming soon"
+      "actionLabel": "Coming soon",
+      "bullet": {
+        "one": "Know your customer",
+        "two": "Legal wrapper "
+      }
     },
     "404": {
       "titleLine1": "Oh no,",

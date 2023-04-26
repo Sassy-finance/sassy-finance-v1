@@ -1,22 +1,29 @@
 // TODO: Remove when statistics are available
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {SupportedNetworksArray, SupportedNetworks} from '@aragon/sdk-client';
-import React, {useEffect} from 'react';
+import { SupportedNetworksArray, SupportedNetworks } from '@aragon/sdk-client';
+import React, { useEffect, useCallback } from 'react';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import styled from 'styled-components';
+import { ButtonText } from '@aragon/ui-components';
+import { useNavigate } from 'react-router-dom';
 
-import {GridLayout} from 'components/layout';
+
+import { GridLayout } from 'components/layout';
 // import ActiveProposalsExplore from 'containers/activeProposalsExplore';
 import Carousel from 'containers/carousel';
-import {DaoExplorer} from 'containers/daoExplorer';
+import { DaoExplorer } from 'containers/daoExplorer';
 import Hero from 'containers/hero';
-import {useNetwork} from 'context/network';
-import {translateToNetworkishName} from 'utils/library';
-import {i18n} from '../../i18n.config';
+import { useNetwork } from 'context/network';
+import { translateToNetworkishName } from 'utils/library';
+import { i18n } from '../../i18n.config';
+import { useWallet } from 'hooks/useWallet';
 
 const Explore: React.FC = () => {
-  const {network, setNetwork} = useNetwork();
+  const { network, setNetwork } = useNetwork();
+  const navigate = useNavigate();
+  const { methods, isConnected } = useWallet();
+
 
   useEffect(() => {
     //FIXME: temporarily when network not supported by the SDK, default to ethereum
@@ -31,12 +38,43 @@ const Explore: React.FC = () => {
     }
   }, [network, setNetwork]);
 
+
+  const handleCTAClick = (path: string) => {
+    if (path.startsWith('http')) {
+      window.open(path, '_blank');
+      return;
+    }
+
+    if (isConnected) {
+      navigate(path);
+      return;
+    }
+    methods
+      .selectWallet()
+      .then(() => {
+        navigate(path);
+      })
+      .catch((err: Error) => {
+        // To be implemented: maybe add an error message when
+        // the error is different from closing the window
+        console.error(err);
+      });
+  }
+
   return (
     <>
       <Hero />
       <GridLayout>
         <ContentWrapper>
           <Carousel />
+          <div className="flex justify-center">
+            <ButtonText
+              size="large"
+              label={'Create a DAO'}
+              onClick={() => handleCTAClick('create')}
+              className={`${'text-center w-6rem h-2rem justify-center'}`}
+            />
+          </div>
           {/* Uncomment when statistics are available */}
           {/* <StatisticsContainer>
             {statistics.map((s: Stats) => (
