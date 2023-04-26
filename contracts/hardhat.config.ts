@@ -21,6 +21,12 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : []
     },
+    hardhat:{
+      forking:{
+        enabled: true,
+        url: process.env.MUMBAI_URL || ""
+      }
+    },
     localhost: {
       url: process.env.LOCAL_URL || "",
       accounts:
