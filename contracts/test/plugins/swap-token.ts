@@ -46,9 +46,21 @@ describe('Swap tokens plugin', function () {
         swapToken = await deployWithProxy(SwapTokenFactory);
 
         await dao.grant(
+            dao.address,
+            swapToken.address,
+            ethers.utils.id('EXECUTE_PERMISSION')
+        );
+
+        await dao.grant(
             swapToken.address,
             signers[1].address,
             ethers.utils.id('SWAP_TOKENS_PERMISSION')
+        );
+
+        await dao.grant(
+            swapToken.address,
+            signers[1].address,
+            ethers.utils.id('WITHDRAW_PERMISSION')
         );
 
         this.upgrade = {
@@ -120,6 +132,39 @@ describe('Swap tokens plugin', function () {
                 signers[1].address)
 
             const balanceAfter = await wether.balanceOf(signers[1].address)
+
+            expect(balanceBefore.toNumber()).to.be.equals(0)
+            expect(balanceAfter.toNumber()).to.be.greaterThan(0)
+
+        });
+
+
+        it('Allowed user should do a swap from treasury assets', async () => {
+            await swapToken.initialize(dao.address, UNISWAP_ROUTER_ADDRESS);
+
+            const ERC20 = await ethers.getContractFactory("ERC20");
+
+            const wmatic = ERC20.attach(WMATIC_ADDRESS)
+            const wether = ERC20.attach(WETHER_ADDRESS)
+
+            await wmatic.connect(impersonatedSigner).transfer(
+                dao.address, ethers.utils.parseEther('0.5')
+            )
+
+            await swapToken.connect(signers[1]).withdrawFromTreasury(
+                WMATIC_ADDRESS,
+                ethers.utils.parseEther('0.5')
+            )
+
+            const balanceBefore = await wether.balanceOf(dao.address)
+
+            await swapToken.connect(signers[1]).swapTokens(
+                WMATIC_ADDRESS,
+                ethers.utils.parseEther('0.5'),
+                WETHER_ADDRESS,
+                dao.address)
+
+            const balanceAfter = await wether.balanceOf(dao.address)
 
             expect(balanceBefore.toNumber()).to.be.equals(0)
             expect(balanceAfter.toNumber()).to.be.greaterThan(0)
