@@ -26,7 +26,7 @@ contract SwapTokenSetup is PluginSetup {
         external
         returns (address plugin, PreparedSetupData memory preparedSetupData)
     {
-        (address uniswapRouter) = abi.decode(_data, (address));
+        address uniswapRouter = abi.decode(_data, (address));
 
         // Prepare and Deploy the plugin proxy.
         plugin = createERC1967Proxy(
@@ -50,6 +50,15 @@ contract SwapTokenSetup is PluginSetup {
             _dao,
             PermissionLib.NO_CONDITION,
             swapToken.SWAP_TOKENS_PERMISSION_ID()
+        );
+
+        // Grant `EXECUTE_PERMISSION` on the DAO to the plugin.
+        permissions[1] = PermissionLib.MultiTargetPermission(
+            PermissionLib.Operation.Grant,
+            _dao,
+            plugin,
+            PermissionLib.NO_CONDITION,
+            DAO(payable(_dao)).EXECUTE_PERMISSION_ID()
         );
 
         preparedSetupData.permissions = permissions;

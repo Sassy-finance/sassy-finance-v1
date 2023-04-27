@@ -1,5 +1,17 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "test": "npx hardhat test",
+    "deploy:mumbai": "npx hardhat run --network mumbai scripts/deploy.ts",
+    "plugin:register": "npx hardhat run --network mumbai scripts/register-plugin.ts",
+    "plugin:prepare:group": "npx hardhat run --network mumbai scripts/prepare-installation-group.ts",
+    "plugin:prepare:swap": "npx hardhat run --network mumbai scripts/prepare-installation-swap.ts",
+    "plugin:apply:group": "npx hardhat run --network mumbai scripts/apply-installation-group.ts",
+    "plugin:apply:swap": "npx hardhat run --network mumbai scripts/apply-installation-swap.ts",
+    "proposal:execute": "npx hardhat run --network mumbai scripts/execute-proposal.ts",
+    "swap": "npx hardhat run --network mumbai scripts/swap.ts",
+    "execute:proposal": "npx hardhat run --network mumbai scripts/execute-proposal.ts"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
@@ -21,6 +33,7 @@
   },
   "dependencies": {
     "@aragon/osx": "^1.2.0",
+    "@aragon/sdk-client": "^1.2.0",
     "@openzeppelin/contracts-upgradeable": "^4.8.3",
     "@uniswap/v3-core": "^1.0.1",
     "@uniswap/v3-periphery": "^1.4.3",

@@ -13,6 +13,10 @@ contract SwapToken is PluginUUPSUpgradeable {
     bytes32 public constant SWAP_TOKENS_PERMISSION_ID =
         keccak256("SWAP_TOKENS_PERMISSION");
 
+    /// @notice The ID of the permission required to withdraw coins.
+    bytes32 public constant WITHDRAW_PERMISSION_ID =
+        keccak256("WITHDRAW_PERMISSION");
+
     ISwapRouter public swapRouter;
     uint24 public constant poolFee = 3000;
 
@@ -49,6 +53,35 @@ contract SwapToken is PluginUUPSUpgradeable {
             });
 
         swapRouter.exactInputSingle(params);
+    }
+
+    function withdrawFromTreasury(
+        address _token,
+        uint256 _amount
+    ) external auth(WITHDRAW_PERMISSION_ID) {
+        IDAO.Action[] memory actions = new IDAO.Action[](2);
+
+        actions[0] = IDAO.Action({
+            to: _token,
+            value: 0 ether,
+            data: abi.encodeWithSelector(
+                bytes4(keccak256("approve(address,uint256)")),
+                address(this),
+                _amount
+            )
+        });
+
+        actions[1] = IDAO.Action({
+            to: _token,
+            value: 0 ether,
+            data: abi.encodeWithSelector(
+                bytes4(keccak256("transfer(address,uint256)")),
+                address(this),
+                _amount
+            )
+        });
+
+        dao().execute({_callId: "", _actions: actions, _allowFailureMap: 0});
     }
 
     /// @dev This empty reserved space is put in place to allow future versions to add new

@@ -9,10 +9,10 @@ import {PluginSetup, IPluginSetup} from "@aragon/osx/framework/plugin/setup/Plug
 import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting/MajorityVotingBase.sol";
 import {GroupVoting} from "./GroupVoting.sol";
 
-/// @title AddresslistVotingSetup
+/// @title GroupVotingSetup
 /// @author Aragon Association - 2022-2023
 /// @notice The setup contract of the `AddresslistVoting` plugin.
-contract AddresslistVotingSetup is PluginSetup {
+contract GroupVotingSetup is PluginSetup {
     /// @notice The address of `AddresslistVoting` plugin logic contract to be used in creating proxy contracts.
     GroupVoting private immutable groupVotingBase;
 
@@ -27,8 +27,8 @@ contract AddresslistVotingSetup is PluginSetup {
         bytes calldata _data
     ) external returns (address plugin, PreparedSetupData memory preparedSetupData) {
         // Decode `_data` to extract the params needed for deploying and initializing `AddresslistVoting` plugin.
-        (MajorityVotingBase.VotingSettings memory votingSettings, address[] memory members) = abi
-            .decode(_data, (MajorityVotingBase.VotingSettings, address[]));
+        (MajorityVotingBase.VotingSettings memory votingSettings) = abi
+            .decode(_data, (MajorityVotingBase.VotingSettings));
 
         // Prepare and Deploy the plugin proxy.
         plugin = createERC1967Proxy(
@@ -36,8 +36,7 @@ contract AddresslistVotingSetup is PluginSetup {
             abi.encodeWithSelector(
                 GroupVoting.initialize.selector,
                 _dao,
-                votingSettings,
-                members
+                votingSettings
             )
         );
 
