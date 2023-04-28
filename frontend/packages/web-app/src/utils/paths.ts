@@ -17,7 +17,7 @@ export const AllTokens = '/daos/:network/:dao/finance/tokens';
 export const AllTransfers = '/daos/:network/:dao/finance/transfers';
 export const NewDeposit = '/daos/:network/:dao/finance/new-deposit';
 export const NewWithDraw = '/daos/:network/:dao/finance/new-withdrawal';
-export const NewManualStrategy = '/daos/:network/:dao/finance/new-manual-strategy';
+export const NewStrategy = '/daos/:network/:dao/finance/new-strategy';
 
 export const Proposal = '/daos/:network/:dao/governance/proposals/:id';
 export const NewProposal = '/daos/:network/:dao/governance/new-proposal';

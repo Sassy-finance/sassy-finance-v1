@@ -9,7 +9,7 @@ import {useGlobalModalContext} from 'context/globalModals';
 import {useNetwork} from 'context/network';
 import {useWallet} from 'hooks/useWallet';
 import {trackEvent} from 'services/analytics';
-import {NewManualStrategy, NewWithDraw} from 'utils/paths';
+import {NewStrategy, NewWithDraw} from 'utils/paths';
 
 type Action = 'manual_strategy' | 'nft_strategy';
 
@@ -25,7 +25,7 @@ const strategyMenu: React.FC = () => {
     if (!isConnected) {
       open('wallet');
     } else if (action === 'manual_strategy') {
-      navigate(generatePath(NewManualStrategy, {network: network, dao: dao}));
+      navigate(generatePath(NewStrategy, {network: network, dao: dao}));
     } else {
       navigate(generatePath(NewWithDraw, {network: network, dao: dao}));
     }
