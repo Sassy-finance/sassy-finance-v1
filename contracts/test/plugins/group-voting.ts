@@ -7,14 +7,27 @@ import { deployWithProxy } from '../utils/proxy';
 import { shouldUpgradeCorrectly } from '../utils/uups-upgradeable';
 import { UPGRADE_PERMISSIONS } from '../utils/permissions';
 import { OZ_ERRORS } from '../utils/error';
-
+import { GroupVoting__factory } from '../../typechain-types/factories/contracts/plugins/GroupVotingPlugin/GroupVoting__factory'
+import {
+    Client, TokenType, WithdrawParams
+} from "@aragon/sdk-client";
 import {
     pctToRatio,
     getTime,
     VotingMode,
     ONE_HOUR,
-    VoteOption
+    VoteOption,
+    advanceIntoVoteTime,
+    voteWithSigners,
+    advanceAfterVoteEnd
 } from '../utils/voting';
+
+import {
+    hexToBytes,
+  } from "@aragon/sdk-common";
+
+import { createContext } from "../../scripts/helpers";
+
 
 describe('Group voting plugin', function () {
     let signers: SignerWithAddress[];
@@ -29,7 +42,10 @@ describe('Group voting plugin', function () {
     let dummyActions: any;
     let dummyMetadata: string;
     let mockToken: any;
-    let endDate: any
+    let endDate: any;
+    const id = 0;
+    const withdrawAmount = 1000000
+
 
     before(async () => {
         signers = await ethers.getSigners();
@@ -132,7 +148,12 @@ describe('Group voting plugin', function () {
     describe('Group members: ', async () => {
         beforeEach(async () => {
             await voting.initialize(dao.address, votingSettings);
-            await voting.createGroup("NFT collectors", [])
+            await voting.createGroup(
+                "NFT collectors",
+                [],
+                mockToken.address,
+                0
+            )
         });
 
         it('should return false, if user is not listed', async () => {
@@ -173,6 +194,25 @@ describe('Group voting plugin', function () {
                 .be.false;
         });
 
+        it('Should deposit assets in vault on group creation', async () => {
+
+            const allowedAddressNFT = await signers[0].getAddress()
+            const initialAmount = 1000000
+            await mockToken.transfer(voting.address, initialAmount)
+
+            await voting.createGroup(
+                "ERC20 Traders",
+                [allowedAddressNFT],
+                mockToken.address,
+                initialAmount
+            )
+
+            const vault = await voting.getGroupVault(1)
+            const vaultBalance = await mockToken.balanceOf(vault)
+
+            expect(vaultBalance).to.be.equal(initialAmount)
+
+        });
     });
 
 
@@ -188,8 +228,18 @@ describe('Group voting plugin', function () {
             const allowedAddressNFT = await signers[0].getAddress()
             const allowedAddressToken = await signers[1].getAddress()
 
-            await voting.createGroup("NFT collectors", [allowedAddressNFT])
-            await voting.createGroup("Token collectors", [allowedAddressToken])
+            await voting.createGroup(
+                "NFT collectors",
+                [allowedAddressNFT],
+                mockToken.address,
+                0
+            )
+            await voting.createGroup(
+                "Token collectors",
+                [allowedAddressToken],
+                mockToken.address,
+                0
+            )
 
             await expect(
                 voting
@@ -229,7 +279,12 @@ describe('Group voting plugin', function () {
 
             const allowedAddressNFT = await signers[0].getAddress()
 
-            await voting.createGroup("NFT collectors", [allowedAddressNFT])
+            await voting.createGroup(
+                "NFT collectors",
+                [allowedAddressNFT],
+                mockToken.address,
+                0
+            )
 
             const allowFailureMap = 1;
 
@@ -294,8 +349,18 @@ describe('Group voting plugin', function () {
             const allowedAddressNFT = await signers[0].getAddress()
             const allowedAddressToken = await signers[1].getAddress()
 
-            await voting.createGroup("NFT collectors", [allowedAddressNFT])
-            await voting.createGroup("Token collectors", [allowedAddressToken])
+            await voting.createGroup(
+                "NFT collectors",
+                [allowedAddressNFT],
+                mockToken.address,
+                0
+            )
+            await voting.createGroup(
+                "Token collectors",
+                [allowedAddressToken],
+                mockToken.address,
+                0
+            )
 
 
             let txNFT = await voting.createProposal(
@@ -335,7 +400,88 @@ describe('Group voting plugin', function () {
                 .to.be.revertedWithCustomError(voting, 'VoteCastForbidden')
 
         })
+
+        it('should create a proposal successfully, vote and execute', async () => {
+
+            await voting.initialize(
+                dao.address,
+                votingSettings
+            );
+
+            const allowedAddressNFT = await signers[0].getAddress()
+
+            const client: Client = new Client(createContext(signers[0]));
+
+            const withdrawParams: WithdrawParams = {
+                amount: BigInt(withdrawAmount),
+                recipientAddressOrEns: voting.address,
+                tokenAddress: mockToken.address,
+                type: TokenType.ERC20
+            }
+
+            const withdrawAction = await client.encoding.withdrawAction(
+                withdrawParams
+            )
+
+            const votingInterface = GroupVoting__factory.createInterface();
+
+            const hexBytes = votingInterface.encodeFunctionData(
+                "createGroup",
+                [
+                    "NFT collectors",
+                    [allowedAddressNFT],
+                    mockToken.address,
+                    0
+                ],
+            );
+
+            const createGroupAction =  {
+                to: voting.address,
+                value: BigInt(0),
+                data: hexToBytes(hexBytes),
+            }
+
+            const balanceBefore = await mockToken.balanceOf(voting.address)
+            await mockToken.transfer(dao.address, withdrawAmount)
+
+            expect(
+                (
+                    await voting.createProposal(
+                        dummyMetadata,
+                        [
+                            withdrawAction,
+                            createGroupAction
+                        ],
+                        0,
+                        startDate,
+                        endDate,
+                        VoteOption.None,
+                        false,
+                        0
+                    )
+                ).value
+            ).to.equal(id);
+        });
+
+        await advanceIntoVoteTime(startDate, endDate);
+
+        await voteWithSigners(voting, id, signers, {
+            yes: [0, 1, 2], // 3 votes
+            no: [3, 4], // 2 votes
+            abstain: [5, 6], // 2 votes
+        });
+
+        await advanceAfterVoteEnd(endDate);
+        expect(await voting.canExecute(id)).to.be.true;
+        await voting.execute(id)
+
+        const balanceAfter = await mockToken.balanceOf(voting.address)
+
+        expect(Number(balanceBefore)).to.be.equals(0)
+        expect(Number(balanceAfter)).to.be.equals(withdrawAmount)
+
     })
+
 
     describe('Funds managemenet', async () => {
         it('Shoul allow only members to withdraw', async () => {
@@ -347,10 +493,14 @@ describe('Group voting plugin', function () {
             );
 
             const allowedAddress = await signers[0].getAddress()
-            const notAllowedAddress = await signers[1].getAddress()
             const destinationAddress = await signers[2].getAddress()
 
-            await voting.createGroup("NFT collectors", [allowedAddress])
+            await voting.createGroup(
+                "NFT collectors",
+                [allowedAddress],
+                mockToken.address,
+                0
+            )
 
             const groupVaultAddress = await voting.getGroupVault(0)
 

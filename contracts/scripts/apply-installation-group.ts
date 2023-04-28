@@ -66,6 +66,8 @@ async function main() {
       permission: "ROOT_PERMISSION"
     })
 
+    client.encoding.withdrawAction
+
   const applyInstallationAction: DaoAction = client.encoding.applyInstallationAction(
     DAO_ADDRESS,
     applyInstallationParams

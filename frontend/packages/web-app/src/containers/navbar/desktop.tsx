@@ -5,7 +5,7 @@ import {
   IconFeedback,
 } from '@aragon/ui-components';
 
-// import NavLinks from 'components/navLinks';
+import NavLinks from 'components/navLinks';
 import React, {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {generatePath, useNavigate, useParams} from 'react-router-dom';
@@ -86,8 +86,7 @@ const DesktopNav: React.FC<DesktopNavProp> = props => {
           />
           <LinksWrapper>
             {breadcrumbs.length < MIN_ROUTE_DEPTH_FOR_BREADCRUMBS ? (
-              // <NavLinks />
-              <></>
+              <NavLinks />
             ) : (
               <>
                 <NavlinksDropdown />
