@@ -13,6 +13,7 @@ import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting
 import {GroupVotingList} from "./GroupVotingList.sol";
 import {Vault} from "./Vault.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title GroupVoting
 /// @notice The majority voting implementation using groups of members
@@ -53,7 +54,9 @@ contract GroupVoting is IMembership, MajorityVotingBase {
 
     function createGroup(
         string calldata _groupName,
-        address[] calldata _members
+        address[] calldata _members,
+        address _tokenAllocation,
+        uint256 _initialAllocation
     ) external auth(CREATE_GROUP_PERMISSION_ID) {
         uint256 groupId = _groupIdCounter.current();
         _groupIdCounter.increment();
@@ -66,6 +69,8 @@ contract GroupVoting is IMembership, MajorityVotingBase {
 
         Vault vault = new Vault();
         groupVault[groupId] = vault;
+
+        ERC20(_tokenAllocation).transfer(address(vault), _initialAllocation);
 
         emit MembersAdded({members: _members});
     }

@@ -102,3 +102,13 @@ jobs:
           --build-arg NODE_OPTIONS='--max-old-space-size=6656' \
           --tag ialberquilla/sassy-frontend
 
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+
+      - name: Restart APP
+        run: doctl apps create-deployment 77c26f54-f5fd-4648-a868-ad983110c654
+
