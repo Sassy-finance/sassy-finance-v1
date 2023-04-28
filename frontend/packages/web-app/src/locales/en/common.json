@@ -47,6 +47,7 @@
     "seeAllTransfers": "See all transfers",
     "to": "To",
     "recipient": "Recipient",
+    "admin": "Strategy Admin",
     "from": "From",
     "token": "Token",
     "amount": "Amount",
@@ -132,6 +133,7 @@
     "changeableVote": "Changeable with a vote",
     "changeable": "Changeable",
     "etherscan": "Etherscan",
+    "delegate": "Delegate",
     "whitelistWallets": {
       "address": "Address",
       "addresses": "{{count}} addresses",
@@ -218,7 +220,8 @@
     "daoName": "Type your DAOs name ...",
     "ensName": "aragon",
     "daoDescription": "Type your summary ...",
-    "addResource": "e.g. Website, Discord, etc"
+    "addResource": "e.g. Website, Discord, etc",
+    "Strategy": "e.g. Aggressive, conservative... "
   },
   "finance": {
     "tokenSection": "Tokens",
@@ -589,6 +592,8 @@
       "title": "Create Strategy",
       "subtitle": "To create a strategy and withdraw assets from the treasury, your proposal will need to pass a vote.",
       "toSubtitle": "The strategy group manager",
+      "delegateSubtitle": "The strategy group delegate",
+      "strategyName": "Strategy name",
       "tokenSubtitle": "Token to withdraw",
       "amountSubtitle": "Amount to be allocated to the strategy group",
       "utcMenu": {

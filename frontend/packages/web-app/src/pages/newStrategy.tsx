@@ -6,9 +6,9 @@ import {useTranslation} from 'react-i18next';
 
 import {FullScreenStepper, Step} from 'components/fullScreenStepper';
 import {Loading} from 'components/temporary';
-import ConfigureManualStrategy, {
-  isValid as configureWithdrawScreenIsValid,
-} from 'containers/configureManualStrategy';
+import ConfigureStrategyForm, {
+  isValid as configureStrategyScreenIsValid,
+} from 'containers/configureStrategy';
 import DefineProposal, {
   isValid as defineProposalIsValid,
 } from 'containers/defineProposal';
@@ -16,9 +16,11 @@ import ReviewProposal from 'containers/reviewProposal';
 import SetupVotingForm, {
   isValid as setupVotingIsValid,
 } from 'containers/setupVotingForm';
+import TokenMenu from 'containers/tokenMenu';
 import {ActionsProvider} from 'context/actions';
 import {CreateProposalProvider} from 'context/createProposal';
 import {useNetwork} from 'context/network';
+import {useDaoBalances} from 'hooks/useDaoBalances';
 import {useDaoDetails} from 'hooks/useDaoDetails';
 import {useDaoParam} from 'hooks/useDaoParam';
 import {PluginTypes} from 'hooks/usePluginClient';
@@ -26,9 +28,12 @@ import {usePluginSettings} from 'hooks/usePluginSettings';
 import {useWallet} from 'hooks/useWallet';
 import {generatePath} from 'react-router-dom';
 import {trackEvent} from 'services/analytics';
+import {fetchTokenPrice} from 'services/prices';
 import {MAX_TOKEN_DECIMALS} from 'utils/constants';
 import {getCanonicalUtcOffset} from 'utils/date';
+import {formatUnits} from 'utils/library';
 import {Finance} from 'utils/paths';
+import {BaseTokenInfo} from 'utils/types';
 
 export type TokenFormData = {
   tokenName: string;
@@ -85,13 +90,14 @@ export const defaultValues = {
   ],
 };
 
-const NewManualStrategy: React.FC = () => {
+const NewStrategy: React.FC = () => {
   const {t} = useTranslation();
   const {network} = useNetwork();
   const {address} = useWallet();
   const [showTxModal, setShowTxModal] = useState(false);
 
   const {data: dao} = useDaoParam();
+  const {data: balances} = useDaoBalances(dao);
   const {data: daoDetails, isLoading: detailsLoading} = useDaoDetails(dao);
   const {data: pluginSettings, isLoading: settingsLoading} = usePluginSettings(
     daoDetails?.plugins[0].instanceAddress as string,
@@ -110,6 +116,45 @@ const NewManualStrategy: React.FC = () => {
     control: formMethods.control,
   });
 
+  /*************************************************
+   *             Callbacks and Handlers            *
+   *************************************************/
+
+  const handleTokenSelect = (token: BaseTokenInfo) => {
+    formMethods.setValue('actions.0.tokenSymbol', token.symbol);
+
+    if (token.address === '') {
+      formMethods.setValue('actions.0.isCustomToken', true);
+      formMethods.resetField('actions.0.tokenName');
+      formMethods.resetField('actions.0.tokenImgUrl');
+      formMethods.resetField('actions.0.tokenAddress');
+      formMethods.resetField('actions.0.tokenBalance');
+      formMethods.clearErrors('actions.0.amount');
+      return;
+    }
+
+    formMethods.clearErrors([
+      'actions.0.tokenAddress',
+      'actions.0.tokenSymbol',
+    ]);
+    formMethods.setValue('actions.0.isCustomToken', false);
+    formMethods.setValue('actions.0.tokenName', token.name);
+    formMethods.setValue('actions.0.tokenImgUrl', token.imgUrl);
+    formMethods.setValue('actions.0.tokenAddress', token.address);
+    formMethods.setValue('actions.0.tokenDecimals', token.decimals);
+    formMethods.setValue(
+      'actions.0.tokenBalance',
+      formatUnits(token.count, token.decimals)
+    );
+
+    fetchTokenPrice(token.address, network, token.symbol).then(price => {
+      formMethods.setValue('actions.0.tokenPrice', price);
+    });
+
+    if (dirtyFields.actions?.[0].amount) {
+      formMethods.trigger('actions.0.amount');
+    }
+  };
 
   /*************************************************
    *                    Render                     *
@@ -136,7 +181,7 @@ const NewManualStrategy: React.FC = () => {
                 wizardTitle={t('newStrategy.configureStrategy.title')}
                 wizardDescription={t('newStrategy.configureStrategy.subtitle')}
                 isNextButtonDisabled={
-                  !configureWithdrawScreenIsValid(
+                  !configureStrategyScreenIsValid(
                     dirtyFields.actions?.[0],
                     errors.actions?.[0],
                     tokenAddress
@@ -156,7 +201,7 @@ const NewManualStrategy: React.FC = () => {
                   next();
                 }}
               >
-                <ConfigureManualStrategy actionIndex={0} />
+                <ConfigureStrategyForm actionIndex={0} />
               </Step>
               <Step
                 wizardTitle={t('newWithdraw.setupVoting.title')}
@@ -231,6 +276,13 @@ const NewManualStrategy: React.FC = () => {
                 <ReviewProposal defineProposalStepNumber={3} />
               </Step>
             </FullScreenStepper>
+            {balances && (
+              <TokenMenu
+                isWallet={false}
+                onTokenSelect={handleTokenSelect}
+                tokenBalances={balances}
+              />
+            )}
           </CreateProposalProvider>
         </ActionsProvider>
       </FormProvider>
@@ -238,4 +290,4 @@ const NewManualStrategy: React.FC = () => {
   );
 };
 
-export default withTransaction('NewWithdraw', 'component')(NewManualStrategy);
+export default withTransaction('NewStrategy', 'component')(NewStrategy);

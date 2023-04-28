@@ -33,7 +33,7 @@ import { useDaoDetails } from 'hooks/useDaoDetails';
 import { useWallet } from 'hooks/useWallet';
 import CreateDAO from 'pages/createDAO';
 import { FormProvider, useForm } from 'react-hook-form';
-import { NewManualStrategy, NotFound } from 'utils/paths';
+import { NotFound } from 'utils/paths';
 import ProtectedRoute from 'components/protectedRoute';
 import { useTransactionDetailContext } from 'context/transactionDetail';
 import Footer from 'containers/footer';
@@ -54,7 +54,7 @@ const TokensPage = lazy(() => import('pages/tokens'));
 const TransfersPage = lazy(() => import('pages/transfers'));
 const NewDepositPage = lazy(() => import('pages/newDeposit'));
 const NewWithdrawPage = lazy(() => import('pages/newWithdraw'));
-const NewManualStrategyPage = lazy(() => import('pages/newManualStrategy'));
+const NewStrategyPage = lazy(() => import('pages/newStrategy'));
 
 const NewProposalPage = lazy(() => import('pages/newProposal'));
 const ProposalPage = lazy(() => import('pages/proposal'));
@@ -115,8 +115,8 @@ function App() {
                   element={<NewWithdrawPage />}
                 />
                 <Route
-                  path="finance/new-manual-strategy"
-                  element={<NewManualStrategyPage />}
+                  path="finance/new-strategy"
+                  element={<NewStrategyPage />}
                 />
                 <Route
                   path="governance/new-proposal"
