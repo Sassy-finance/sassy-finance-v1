@@ -10,6 +10,7 @@
     "plugin:apply:swap": "npx hardhat run --network mumbai scripts/apply-installation-swap.ts",
     "proposal:execute": "npx hardhat run --network mumbai scripts/execute-proposal.ts",
     "swap": "npx hardhat run --network mumbai scripts/swap.ts",
+    "create:group": "npx hardhat run --network mumbai scripts/createGroup.ts",
     "execute:proposal": "npx hardhat run --network mumbai scripts/execute-proposal.ts"
   },
   "devDependencies": {

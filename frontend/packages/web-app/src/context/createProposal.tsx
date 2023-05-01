@@ -64,6 +64,7 @@ import {
 import {useGlobalModalContext} from './globalModals';
 import {useNetwork} from './network';
 import {usePrivacyContext} from './privacyContext';
+import {encodeCreateGroupAction} from '../utils/encoding'
 
 type Props = {
   showTxModal: boolean;
@@ -133,10 +134,13 @@ const CreateProposalProvider: React.FC<Props> = ({
     const actionsFromForm = getValues('actions');
     const actions: Array<Promise<DaoAction>> = [];
 
+    console.log({actions})
+
     // return an empty array for undefined clients
     if (!pluginClient || !client) return Promise.resolve([] as DaoAction[]);
 
     getNonEmptyActions(actionsFromForm).forEach((action: Action) => {
+      console.log(action)
       switch (action.name) {
         case 'withdraw_assets': {
           actions.push(
@@ -216,6 +220,19 @@ const CreateProposalProvider: React.FC<Props> = ({
           );
           break;
         }
+        case 'create_group': {
+          actions.push(
+            encodeCreateGroupAction(
+              action.groupName,
+              [action.admin, action.delegate],
+              action.tokenAddress,
+              action.initialAllocation,
+              action.to,
+              6
+            )
+          );
+          break;
+        }
       }
     });
 
@@ -255,6 +272,8 @@ const CreateProposalProvider: React.FC<Props> = ({
       ]);
 
       const actions = await encodeActions();
+
+      console.log({'encoded':actions})
 
       const metadata: ProposalMetadata = {
         title,

@@ -51,7 +51,7 @@ contract GroupVoting is IMembership, MajorityVotingBase {
     ) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
     }
-
+ 
     function createGroup(
         string calldata _groupName,
         address[] calldata _members,

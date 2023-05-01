@@ -13,8 +13,19 @@ async function main() {
   )
 
   const tokenPluginContract = TokenPlugin.attach(TOKEN_PLUGIN_ADDRESS)
-  await tokenPluginContract.execute(9);
 
+
+  try {
+    const tx = await  tokenPluginContract.execute(14);
+    const receipt = await tx.wait();
+    console.log(receipt);
+  } catch (error) {
+    if (error.code === 'TRANSACTION_REVERTED') {
+      console.error(`Transaction reverted with reason: ${error.receipt.transactionRevertReason}`);
+    } else {
+      console.error(error);
+    }
+  }
 }
 
 main().catch((error) => {

@@ -431,7 +431,7 @@ describe('Group voting plugin', function () {
                     "NFT collectors",
                     [allowedAddressNFT],
                     mockToken.address,
-                    0
+                    withdrawAmount
                 ],
             );
 

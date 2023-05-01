@@ -66,6 +66,8 @@ const ReviewProposal: React.FC<ReviewProposalProps> = ({
   const {getValues, setValue} = useFormContext();
   const values = getValues();
 
+  console.log(values)
+
   const editor = useEditor({
     editable: false,
     content: values.proposal,
