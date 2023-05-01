@@ -7,8 +7,8 @@ async function main() {
   const signers = await ethers.getSigners();
   const maintainer = await signers[0].getAddress()
 
-  const PLUGIN_CONTRACT_NAME = "SwapTokenSetup"
-  const PLUGIN_NAME = "plugin-1225"
+  const PLUGIN_CONTRACT_NAME = "GroupVotingSetup"
+  const PLUGIN_NAME = "plugin-1226"
 
   const PluginSetup = await ethers.getContractFactory(PLUGIN_CONTRACT_NAME);
   const pluginSetup = await PluginSetup.deploy();

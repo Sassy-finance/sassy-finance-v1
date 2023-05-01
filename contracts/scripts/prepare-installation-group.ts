@@ -11,7 +11,7 @@ const abiCoder = ethers.utils.defaultAbiCoder;
 
 async function main() {
 
-  const PLUGIN_REPO_ADDRESS = '0xb6c8528a695375a3cd65be41bf07e8346d46615f'
+  const PLUGIN_REPO_ADDRESS = '0xc8ee129a48d52ff830b555317a2566edf5eae0a8'
 
   const defaultVotingSettings = {
     votingMode: VotingMode.EarlyExecution,

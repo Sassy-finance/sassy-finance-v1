@@ -10,6 +10,7 @@ import {ModifyMultisigSettingsCard} from './actions/modifyMultisigSettingsCard';
 import {ModifyMvSettingsCard} from './actions/modifySettingsCard';
 import {RemoveAddressCard} from './actions/removeAddressCard';
 import {WithdrawCard} from './actions/withdrawCard';
+import {CreateGroupCard} from './actions/createGroupCard';
 
 type ActionsFilterProps = {
   action: Action;
@@ -37,6 +38,8 @@ export const ActionsFilter: React.FC<ActionsFilterProps> = ({action}) => {
       return <ModifyMvSettingsCard action={action} />;
     case 'modify_multisig_voting_settings':
       return <ModifyMultisigSettingsCard action={action} />;
+    case 'create_group':
+        return <CreateGroupCard action={action} daoName={dao?.metadata?.name || ''} />;
     default:
       return <></>;
   }

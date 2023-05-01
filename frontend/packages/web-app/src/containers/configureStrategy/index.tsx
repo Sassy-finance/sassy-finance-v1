@@ -37,10 +37,13 @@ import {
 } from 'utils/validators';
 import { useAlertContext } from 'context/alert';
 
-type ConfigureStrategyFormProps = ActionIndex; //extend if necessary
+type ConfigureStrategyFormProps = ActionIndex & {
+  groupActionIndex: number
+}
 
 const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
   actionIndex,
+  groupActionIndex
 }) => {
   const { t } = useTranslation();
   const client = useApolloClient();
@@ -56,7 +59,17 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
     useFormContext();
 
   const { errors, dirtyFields } = useFormState({ control });
-  const [name, from, tokenAddress, isCustomToken, tokenBalance, tokenSymbol] =
+  const [
+    name,
+    from,
+    tokenAddress,
+    isCustomToken,
+    tokenBalance,
+    tokenSymbol,
+    admin,
+    delegate,
+    groupName
+  ] =
     useWatch({
       name: [
         `actions.${actionIndex}.name`,
@@ -65,6 +78,9 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
         `actions.${actionIndex}.isCustomToken`,
         `actions.${actionIndex}.tokenBalance`,
         `actions.${actionIndex}.tokenSymbol`,
+        `actions.${groupActionIndex}.admin`,
+        `actions.${groupActionIndex}.delegate`,
+        `actions.${groupActionIndex}.groupName`
       ],
     });
   const nativeCurrency = CHAIN_METADATA[network].nativeCurrency;
@@ -137,6 +153,11 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
           Number(chainData.decimals)
         );
         setValue(`actions.${actionIndex}.tokenBalance`, balance);
+
+        setValue(`actions.${groupActionIndex}.admin`, admin);
+        setValue(`actions.${groupActionIndex}.delegate`, delegate);
+        setValue(`actions.${groupActionIndex}.groupName`, groupName);
+
       } catch (error) {
         /**
          * Error is intentionally swallowed. Passing invalid address will
@@ -151,6 +172,8 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
           `actions.${actionIndex}.amount`,
           `actions.${actionIndex}.tokenSymbol`,
         ]);
+
+
     };
 
     fetchTokenInfo();
@@ -293,7 +316,7 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
           helpText={t('newStrategy.configureStrategy.strategyName')}
         />
         <Controller
-          name={`actions.${actionIndex}.strategyName`}
+          name={`actions.${groupActionIndex}.groupName`}
           control={control}
           defaultValue=""
           render={({
@@ -324,7 +347,7 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
           helpText={t('newStrategy.configureStrategy.toSubtitle')}
         />
         <Controller
-          name={`actions.${actionIndex}.to`}
+          name={`actions.${groupActionIndex}.admin`}
           control={control}
           defaultValue=""
           rules={{
@@ -361,7 +384,7 @@ const ConfigureStrategyForm: React.FC<ConfigureStrategyFormProps> = ({
           helpText={t('newStrategy.configureStrategy.delegateSubtitle')}
         />
         <Controller
-          name={`actions.${actionIndex}.delegate`}
+          name={`actions.${groupActionIndex}.delegate`}
           control={control}
           defaultValue=""
           rules={{
@@ -529,7 +552,7 @@ export function isValid(
   tokenAddress?: string
 ) {
   // check if fields are dirty
-  if (!dirtyFields?.to || !dirtyFields?.amount || !tokenAddress) return false;
+  if (!dirtyFields?.amount || !tokenAddress) return false;
 
   // check if fields have errors
   if (errors?.to || errors?.amount || errors?.tokenAddress) return false;

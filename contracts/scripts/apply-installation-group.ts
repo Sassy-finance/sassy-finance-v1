@@ -31,7 +31,7 @@ async function main() {
     signers[0]
   )
 
-  const prepareTx = "0x886acbc87e63eee806bad50922f1204ab54a382fcd0225944a21c9d52ad8c604"
+  const prepareTx = "0x9a6aa9eaa99b6e425729430ecabef4d733e557661d9452e9e4d94a52b9eb77b7"
   const txApply = await ethers.provider.getTransactionReceipt(prepareTx)
   const logs = txApply.logs
     .filter(log => log.address == PLUGIN_SETUP_PROCESSOR_ADDRESS)
@@ -41,8 +41,8 @@ async function main() {
   const plugin = logs[0].args.plugin
   const pluginSetupRepo = logs[0].args.pluginSetupRepo
 
-  console.log(plugin)
-  console.log(pluginSetupRepo)
+  console.log({ plugin })
+  console.log({ pluginSetupRepo })
 
   const client: Client = new Client(createContext(signers[0]));
   const metadata = ethers.utils.toUtf8Bytes("ipfs://bafybeihm5uheiqbxpawvk2arucmymipj74jyxtsodzykwnp4keoylsymiu");
@@ -66,7 +66,14 @@ async function main() {
       permission: "ROOT_PERMISSION"
     })
 
-    client.encoding.withdrawAction
+  const grantDAOPlugin = client.encoding.grantAction(
+    DAO_ADDRESS,
+    {
+      where: plugin,
+      who: DAO_ADDRESS,
+      permission: "CREATE_GROUP_PERMISSION"
+    })
+
 
   const applyInstallationAction: DaoAction = client.encoding.applyInstallationAction(
     DAO_ADDRESS,
@@ -83,20 +90,21 @@ async function main() {
   const startDate = (await getTime()) + START_OFFSET;
   const endDate = startDate + ONE_DAY;
 
-  const tx = await tokenPluginContract.createProposal(
-    metadata,
-    [
-      grantPluginSetup,
-      fixedApplyInstallationAction
-    ],
-    0,
-    startDate,
-    endDate,
-    0,
-    true
-  );
+    const tx = await tokenPluginContract.createProposal(
+      metadata,
+      [
+        grantPluginSetup,
+        fixedApplyInstallationAction,
+        grantDAOPlugin
+      ],
+      0,
+      startDate,
+      endDate,
+      0,
+      true
+    );
 
-  tx.wait()
+    tx.wait()
 }
 
 main().catch((error) => {
@@ -105,3 +113,4 @@ main().catch((error) => {
 });
 
 
+// 0x40474d539e720f23b75474939426d1fcc8a42dc1

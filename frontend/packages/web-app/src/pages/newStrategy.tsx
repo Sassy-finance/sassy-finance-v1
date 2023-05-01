@@ -1,11 +1,11 @@
-import {Address} from '@aragon/ui-components/dist/utils/addresses';
-import {withTransaction} from '@elastic/apm-rum-react';
-import React, {useState} from 'react';
-import {FormProvider, useForm, useFormState, useWatch} from 'react-hook-form';
-import {useTranslation} from 'react-i18next';
+import { Address } from '@aragon/ui-components/dist/utils/addresses';
+import { withTransaction } from '@elastic/apm-rum-react';
+import React, { useState } from 'react';
+import { FormProvider, useForm, useFormState, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
-import {FullScreenStepper, Step} from 'components/fullScreenStepper';
-import {Loading} from 'components/temporary';
+import { FullScreenStepper, Step } from 'components/fullScreenStepper';
+import { Loading } from 'components/temporary';
 import ConfigureStrategyForm, {
   isValid as configureStrategyScreenIsValid,
 } from 'containers/configureStrategy';
@@ -17,23 +17,23 @@ import SetupVotingForm, {
   isValid as setupVotingIsValid,
 } from 'containers/setupVotingForm';
 import TokenMenu from 'containers/tokenMenu';
-import {ActionsProvider} from 'context/actions';
-import {CreateProposalProvider} from 'context/createProposal';
-import {useNetwork} from 'context/network';
-import {useDaoBalances} from 'hooks/useDaoBalances';
-import {useDaoDetails} from 'hooks/useDaoDetails';
-import {useDaoParam} from 'hooks/useDaoParam';
-import {PluginTypes} from 'hooks/usePluginClient';
-import {usePluginSettings} from 'hooks/usePluginSettings';
-import {useWallet} from 'hooks/useWallet';
-import {generatePath} from 'react-router-dom';
-import {trackEvent} from 'services/analytics';
-import {fetchTokenPrice} from 'services/prices';
-import {MAX_TOKEN_DECIMALS} from 'utils/constants';
-import {getCanonicalUtcOffset} from 'utils/date';
-import {formatUnits} from 'utils/library';
-import {Finance} from 'utils/paths';
-import {BaseTokenInfo} from 'utils/types';
+import { ActionsProvider } from 'context/actions';
+import { CreateProposalProvider } from 'context/createProposal';
+import { useNetwork } from 'context/network';
+import { useDaoBalances } from 'hooks/useDaoBalances';
+import { useDaoDetails } from 'hooks/useDaoDetails';
+import { useDaoParam } from 'hooks/useDaoParam';
+import { PluginTypes } from 'hooks/usePluginClient';
+import { usePluginSettings } from 'hooks/usePluginSettings';
+import { useWallet } from 'hooks/useWallet';
+import { generatePath } from 'react-router-dom';
+import { trackEvent } from 'services/analytics';
+import { fetchTokenPrice } from 'services/prices';
+import { MAX_TOKEN_DECIMALS } from 'utils/constants';
+import { getCanonicalUtcOffset } from 'utils/date';
+import { formatUnits } from 'utils/library';
+import { Finance } from 'utils/paths';
+import { BaseTokenInfo } from 'utils/types';
 
 export type TokenFormData = {
   tokenName: string;
@@ -51,6 +51,10 @@ export type WithdrawAction = TokenFormData & {
   from: Address;
   amount: string;
   name: string; // This indicates the type of action; Deposit is NOT an action
+  initialAllocation: string;
+  admin: string;
+  delegate: string;
+  groupName: string;
 };
 
 type WithdrawFormData = {
@@ -72,34 +76,45 @@ type WithdrawFormData = {
 };
 
 export const defaultValues = {
-  links: [{name: '', url: ''}],
+  links: [{ name: '', url: '' }],
   startSwitch: 'now',
   durationSwitch: 'duration',
   actions: [
     {
       name: 'withdraw_assets',
-      to: '',
+      to: '0x54F634508A378C5185719a310A11E7A32EB7185b', //plugin address
       from: '',
       amount: '',
       tokenAddress: '',
-      tokenDecimals: MAX_TOKEN_DECIMALS,
+      tokenDecimals: 6,
       tokenSymbol: '',
       tokenName: '',
       tokenImgUrl: '',
+      admin: ''
     },
+    {
+      name: 'create_group',
+      to: '0x54F634508A378C5185719a310A11E7A32EB7185b', //plugin address
+      tokenAddress: '0xe9dce89b076ba6107bb64ef30678efec11939234',
+      tokenDecimals: 6,
+      admin: '',
+      delegate: '',
+      groupName: '',
+      initialAllocation: '',
+    }
   ],
 };
 
 const NewStrategy: React.FC = () => {
-  const {t} = useTranslation();
-  const {network} = useNetwork();
-  const {address} = useWallet();
+  const { t } = useTranslation();
+  const { network } = useNetwork();
+  const { address } = useWallet();
   const [showTxModal, setShowTxModal] = useState(false);
 
-  const {data: dao} = useDaoParam();
-  const {data: balances} = useDaoBalances(dao);
-  const {data: daoDetails, isLoading: detailsLoading} = useDaoDetails(dao);
-  const {data: pluginSettings, isLoading: settingsLoading} = usePluginSettings(
+  const { data: dao } = useDaoParam();
+  const { data: balances } = useDaoBalances(dao);
+  const { data: daoDetails, isLoading: detailsLoading } = useDaoDetails(dao);
+  const { data: pluginSettings, isLoading: settingsLoading } = usePluginSettings(
     daoDetails?.plugins[0].instanceAddress as string,
     daoDetails?.plugins[0].id as PluginTypes
   );
@@ -109,7 +124,7 @@ const NewStrategy: React.FC = () => {
     mode: 'onChange',
   });
 
-  const {errors, dirtyFields} = useFormState({control: formMethods.control});
+  const { errors, dirtyFields } = useFormState({ control: formMethods.control });
 
   const [tokenAddress] = useWatch({
     name: ['actions.0.tokenAddress'],
@@ -175,7 +190,7 @@ const NewStrategy: React.FC = () => {
             <FullScreenStepper
               wizardProcessName={t('TransferModal.item2Title')}
               navLabel={t('allTransfer.newTransfer')}
-              returnPath={generatePath(Finance, {network, dao})}
+              returnPath={generatePath(Finance, { network, dao })}
             >
               <Step
                 wizardTitle={t('newStrategy.configureStrategy.title')}
@@ -188,6 +203,8 @@ const NewStrategy: React.FC = () => {
                   )
                 }
                 onNextButtonClicked={next => {
+                  const initialAllocation = formMethods.getValues('actions.0.amount')
+                  formMethods.setValue('actions.1.initialAllocation', initialAllocation);
                   trackEvent('newWithdraw_continueBtn_clicked', {
                     step: '1_configure_withdraw',
                     settings: {
@@ -201,7 +218,7 @@ const NewStrategy: React.FC = () => {
                   next();
                 }}
               >
-                <ConfigureStrategyForm actionIndex={0} />
+                <ConfigureStrategyForm actionIndex={0} groupActionIndex={1} />
               </Step>
               <Step
                 wizardTitle={t('newWithdraw.setupVoting.title')}

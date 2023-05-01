@@ -217,7 +217,8 @@ export type ActionsTypes =
   | 'modify_token_voting_settings'
   | 'modify_metadata'
   | 'modify_multisig_voting_settings'
-  | 'update_minimum_approval';
+  | 'update_minimum_approval'
+  | 'create_group'
 
 // TODO Refactor ActionWithdraw With the new input structure
 export type ActionWithdraw = {
@@ -232,6 +233,18 @@ export type ActionWithdraw = {
   tokenPrice: number;
   tokenSymbol: string;
   isCustomToken: boolean;
+};
+
+export type ActionCreateGroup = {
+  amount: number;
+  name: 'create_group';
+  to: Address;
+  tokenAddress: Address;
+  tokenDecimals: number;
+  admin: string;
+  delegate: string;
+  groupName: string;
+  initialAllocation: number;
 };
 
 // TODO: merge these types
@@ -312,7 +325,8 @@ export type Action =
   | ActionUpdatePluginSettings
   | ActionUpdateMetadata
   | ActionUpdateMinimumApproval
-  | ActionUpdateMultisigPluginSettings;
+  | ActionUpdateMultisigPluginSettings
+  | ActionCreateGroup
 
 export type ParamType = {
   type: string;

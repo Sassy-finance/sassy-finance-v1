@@ -229,8 +229,12 @@ const Proposal: React.FC = () => {
           client?.decoding.findInterface(action.data) ||
           pluginClient?.decoding.findInterface(action.data);
 
+          console.log(action)
+          console.log(functionParams)
+
         switch (functionParams?.functionName) {
           case undefined:
+          case null:
           case 'transfer':
             return decodeWithdrawToAction(
               action.data,
