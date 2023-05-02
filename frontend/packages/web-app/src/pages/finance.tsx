@@ -21,6 +21,8 @@ import {useMappedBreadcrumbs} from 'hooks/useMappedBreadcrumbs';
 import useScreen from 'hooks/useScreen';
 import {trackEvent} from 'services/analytics';
 import {sortTokens} from 'utils/tokens';
+import {useGroupPlugin} from 'hooks/useGroupPlugin'
+import StrategyList from 'components/strategyList';
 
 type Sign = -1 | 0 | 1;
 const colors: Record<Sign, string> = {
@@ -43,6 +45,10 @@ const Finance: React.FC = () => {
     useDaoVault(daoId);
 
   sortTokens(tokens, 'treasurySharePercentage', true);
+
+  const {groups} = useGroupPlugin()
+
+  console.log(groups)
 
   /*************************************************
    *                    Render                     *
@@ -123,10 +129,10 @@ const Finance: React.FC = () => {
       <TokenSectionWrapper title={"Overview"}>
         <div className="grid grid-cols-2 gap-4">
           <ListContainer>
-            <PieChart/>
+            <PieChart groups={groups}/>
           </ListContainer>
           <ListContainer>
-            <TokenList tokens={tokens.slice(0, 5)} />
+            <StrategyList groups={groups}/>
           </ListContainer>
         </div>
       </TokenSectionWrapper>

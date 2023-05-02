@@ -35,8 +35,8 @@ contract GroupVoting is IMembership, MajorityVotingBase {
     bytes32 public constant CREATE_GROUP_PERMISSION_ID =
         keccak256("CREATE_GROUP_PERMISSION");
 
-    Counters.Counter private _groupIdCounter;
-    mapping(string => uint256) public groupsNames;
+    Counters.Counter public _groupIdCounter;
+    mapping(uint256 => string) public groupsNames;
     mapping(uint256 => GroupVotingList) public groups;
     mapping(uint256 => Vault) public groupVault;
     mapping(uint256 => uint256) public proposalGroup;
@@ -64,7 +64,7 @@ contract GroupVoting is IMembership, MajorityVotingBase {
         GroupVotingList group = new GroupVotingList();
         group.addAddresses(_members);
 
-        groupsNames[_groupName] = groupId;
+        groupsNames[groupId] = _groupName;
         groups[groupId] = group;
 
         Vault vault = new Vault();
