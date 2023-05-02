@@ -7,16 +7,18 @@ async function main() {
 
 
     const GroupVoting = await ethers.getContractFactory("GroupVoting");
-    const groupVoting = GroupVoting.attach('0x54F634508A378C5185719a310A11E7A32EB7185b')
+    const groupVoting = GroupVoting.attach('0xB231162ab49971EB44bfC8245b1Bf68ad6e333dF')
 
-    const txcreate = await groupVoting.createGroup(
-        "groupName",
-        ["0x7C61C48919805eDC3Bd75ace9d7211Fb3b0Ed13D", "0x7C61C48919805eDC3Bd75ace9d7211Fb3b0Ed13D"],
-        "0xe9dce89b076ba6107bb64ef30678efec11939234",
-        0
-    )
+    // const txcreate = await groupVoting.createGroup(
+    //     "groupName",
+    //     ["0x7C61C48919805eDC3Bd75ace9d7211Fb3b0Ed13D", "0x7C61C48919805eDC3Bd75ace9d7211Fb3b0Ed13D"],
+    //     "0xe9dce89b076ba6107bb64ef30678efec11939234",
+    //     0
+    // )
 
-    await txcreate.wait()
+    const groups = await groupVoting.groupsNames(0)
+
+    console.log(groups)
 
 }
 

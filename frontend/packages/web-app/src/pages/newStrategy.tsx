@@ -82,7 +82,7 @@ export const defaultValues = {
   actions: [
     {
       name: 'withdraw_assets',
-      to: '0x54F634508A378C5185719a310A11E7A32EB7185b', //plugin address
+      to: '0xB231162ab49971EB44bfC8245b1Bf68ad6e333dF', //plugin address
       from: '',
       amount: '',
       tokenAddress: '',
@@ -94,7 +94,7 @@ export const defaultValues = {
     },
     {
       name: 'create_group',
-      to: '0x54F634508A378C5185719a310A11E7A32EB7185b', //plugin address
+      to: '0xB231162ab49971EB44bfC8245b1Bf68ad6e333dF', //plugin address
       tokenAddress: '0xe9dce89b076ba6107bb64ef30678efec11939234',
       tokenDecimals: 6,
       admin: '',
