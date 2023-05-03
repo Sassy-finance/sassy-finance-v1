@@ -1,10 +1,9 @@
-import {Breadcrumb, ButtonText, IconAdd, Tag} from '@aragon/ui-components';
+import {Breadcrumb, ButtonText, IconAdd} from '@aragon/ui-components';
 import {withTransaction} from '@elastic/apm-rum-react';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import styled from 'styled-components';
-import PieChart from 'components/pieChart';
 import {Loading} from 'components/temporary/loading';
 import TokenList from 'components/tokenList';
 import TransferList from 'components/transferList';
@@ -21,8 +20,6 @@ import {useMappedBreadcrumbs} from 'hooks/useMappedBreadcrumbs';
 import useScreen from 'hooks/useScreen';
 import {trackEvent} from 'services/analytics';
 import {sortTokens} from 'utils/tokens';
-import {useGroupPlugin} from 'hooks/useGroupPlugin'
-import StrategyList from 'components/strategyList';
 
 type Sign = -1 | 0 | 1;
 const colors: Record<Sign, string> = {
@@ -31,7 +28,7 @@ const colors: Record<Sign, string> = {
   '0': 'text-ui-600',
 };
 
-const Finance: React.FC = () => {
+const Strategy: React.FC = () => {
   const {t} = useTranslation();
   const {open} = useGlobalModalContext();
   const {isDesktop} = useScreen();
@@ -41,14 +38,10 @@ const Finance: React.FC = () => {
   const {data: daoId, isLoading} = useDaoParam();
 
   const {handleTransferClicked} = useTransactionDetailContext();
-  const {tokens, totalAssetChange, totalAssetValue, transfers} =
+  const {tokens, transfers} =
     useDaoVault(daoId);
 
   sortTokens(tokens, 'treasurySharePercentage', true);
-
-  const {groups} = useGroupPlugin()
-
-  console.log(groups)
 
   /*************************************************
    *                    Render                     *
@@ -74,7 +67,7 @@ const Finance: React.FC = () => {
             {/* Main */}
             <ContentContainer>
               <TextContainer>
-                <Title>
+                {/* <Title>
                   {new Intl.NumberFormat('en-US', {
                     style: 'currency',
                     currency: 'USD',
@@ -92,13 +85,13 @@ const Finance: React.FC = () => {
                       signDisplay: 'always',
                     }).format(totalAssetChange)}
                   </Description>
-                </SubtitleContainer>
+                </SubtitleContainer> */}
               </TextContainer>
 
               {/* Button */}
               <ButtonText
                 size="large"
-                label={t('TransferModal.createStrategy')}
+                label={'Add member'}
                 iconLeft={<IconAdd />}
                 className="w-full tablet:w-auto"
                 onClick={() => {
@@ -110,7 +103,7 @@ const Finance: React.FC = () => {
               />
               <ButtonText
                 size="large"
-                label={t('TransferModal.newTransfer')}
+                label={'Swap assets'}
                 iconLeft={<IconAdd />}
                 className="w-full tablet:w-auto"
                 onClick={() => {
@@ -127,14 +120,9 @@ const Finance: React.FC = () => {
     >
       <div className={'h-4'} />
       <TokenSectionWrapper title={"Overview"}>
-        <div className="grid grid-cols-2 gap-4">
           <ListContainer>
-            <PieChart groups={groups}/>
+            <TokenList tokens={tokens}></TokenList>
           </ListContainer>
-          <ListContainer>
-            <StrategyList groups={groups} dao={daoId}/>
-          </ListContainer>
-        </div>
       </TokenSectionWrapper>
       <div className={'h-4'} />
       <TransferSectionWrapper title={t('finance.transferSection')} showButton>
@@ -149,7 +137,7 @@ const Finance: React.FC = () => {
   );
 };
 
-export default withTransaction('Finance', 'component')(Finance);
+export default withTransaction('Strategy', 'component')(Strategy);
 
 const ListContainer = styled.div.attrs({
   className: 'py-2 space-y-2',
