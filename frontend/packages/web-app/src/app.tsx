@@ -55,6 +55,7 @@ const TransfersPage = lazy(() => import('pages/transfers'));
 const NewDepositPage = lazy(() => import('pages/newDeposit'));
 const NewWithdrawPage = lazy(() => import('pages/newWithdraw'));
 const NewStrategyPage = lazy(() => import('pages/newStrategy'));
+const StrategyPage = lazy(() => import('pages/strategy'));
 
 const NewProposalPage = lazy(() => import('pages/newProposal'));
 const ProposalPage = lazy(() => import('pages/proposal'));
@@ -117,6 +118,10 @@ function App() {
                 <Route
                   path="finance/new-strategy"
                   element={<NewStrategyPage />}
+                />
+                <Route
+                  path="finance/strategy/:id"
+                  element={<StrategyPage />}
                 />
                 <Route
                   path="governance/new-proposal"
