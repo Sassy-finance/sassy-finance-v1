@@ -48,8 +48,6 @@ const Finance: React.FC = () => {
 
   const {groups} = useGroupPlugin()
 
-  console.log(groups)
-
   /*************************************************
    *                    Render                     *
    *************************************************/
