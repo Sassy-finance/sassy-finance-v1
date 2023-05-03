@@ -57,6 +57,7 @@ const NewWithdrawPage = lazy(() => import('pages/newWithdraw'));
 const NewStrategyPage = lazy(() => import('pages/newStrategy'));
 const StrategyPage = lazy(() => import('pages/strategy'));
 const Swap = lazy(() => import('pages/swapTokens'));
+const BuyNFT = lazy(() => import('pages/buyNFT'));
 
 const NewProposalPage = lazy(() => import('pages/newProposal'));
 const ProposalPage = lazy(() => import('pages/proposal'));
@@ -127,6 +128,10 @@ function App() {
                 <Route
                   path="finance/swap"
                   element={<Swap />}
+                />
+                <Route
+                  path="finance/buy-nft"
+                  element={<BuyNFT />}
                 />
                 <Route
                   path="governance/new-proposal"
