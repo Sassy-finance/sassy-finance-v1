@@ -1,10 +1,10 @@
-import {Breadcrumb, ButtonText, IconAdd} from '@aragon/ui-components';
-import {withTransaction} from '@elastic/apm-rum-react';
+import { Breadcrumb, ButtonText, IconAdd } from '@aragon/ui-components';
+import { withTransaction } from '@elastic/apm-rum-react';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
-import {useNavigate} from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
-import {Loading} from 'components/temporary/loading';
+import { Loading } from 'components/temporary/loading';
 import TokenList from 'components/tokenList';
 import TransferList from 'components/transferList';
 import {
@@ -12,14 +12,16 @@ import {
   TokenSectionWrapper,
   TransferSectionWrapper,
 } from 'components/wrappers';
-import {useGlobalModalContext} from 'context/globalModals';
-import {useTransactionDetailContext} from 'context/transactionDetail';
-import {useDaoParam} from 'hooks/useDaoParam';
-import {useDaoVault} from 'hooks/useDaoVault';
-import {useMappedBreadcrumbs} from 'hooks/useMappedBreadcrumbs';
+import { useGlobalModalContext } from 'context/globalModals';
+import { useTransactionDetailContext } from 'context/transactionDetail';
+import { useDaoParam } from 'hooks/useDaoParam';
+import { useDaoVault } from 'hooks/useDaoVault';
+import { useMappedBreadcrumbs } from 'hooks/useMappedBreadcrumbs';
 import useScreen from 'hooks/useScreen';
-import {trackEvent} from 'services/analytics';
-import {sortTokens} from 'utils/tokens';
+import { trackEvent } from 'services/analytics';
+import { sortTokens } from 'utils/tokens';
+import { Swap } from 'utils/paths'
+import { useNetwork } from 'context/network';
 
 type Sign = -1 | 0 | 1;
 const colors: Record<Sign, string> = {
@@ -29,16 +31,17 @@ const colors: Record<Sign, string> = {
 };
 
 const Strategy: React.FC = () => {
-  const {t} = useTranslation();
-  const {open} = useGlobalModalContext();
-  const {isDesktop} = useScreen();
+  const { t } = useTranslation();
+  const { open } = useGlobalModalContext();
+  const { isDesktop } = useScreen();
+  const { network } = useNetwork();
 
   const navigate = useNavigate();
-  const {breadcrumbs, icon, tag} = useMappedBreadcrumbs();
-  const {data: daoId, isLoading} = useDaoParam();
+  const { breadcrumbs, icon, tag } = useMappedBreadcrumbs();
+  const { data: daoId, isLoading } = useDaoParam();
 
-  const {handleTransferClicked} = useTransactionDetailContext();
-  const {tokens, transfers} =
+  const { handleTransferClicked } = useTransactionDetailContext();
+  const { tokens, transfers } =
     useDaoVault(daoId);
 
   sortTokens(tokens, 'treasurySharePercentage', true);
@@ -110,7 +113,7 @@ const Strategy: React.FC = () => {
                   trackEvent('finance_newTransferBtn_clicked', {
                     dao_address: daoId,
                   });
-                  open();
+                  navigate(generatePath(Swap, { network, dao: daoId }));
                 }}
               />
             </ContentContainer>
@@ -120,9 +123,9 @@ const Strategy: React.FC = () => {
     >
       <div className={'h-4'} />
       <TokenSectionWrapper title={"Overview"}>
-          <ListContainer>
-            <TokenList tokens={tokens}></TokenList>
-          </ListContainer>
+        <ListContainer>
+          <TokenList tokens={tokens}></TokenList>
+        </ListContainer>
       </TokenSectionWrapper>
       <div className={'h-4'} />
       <TransferSectionWrapper title={t('finance.transferSection')} showButton>
