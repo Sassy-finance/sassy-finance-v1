@@ -6,7 +6,7 @@ const abiCoder = ethers.utils.defaultAbiCoder;
 
 async function main() {
 
-  const PLUGIN_REPO_ADDRESS = '0x8230232087928e56b7d8bb86ff00e729cf28c8af'
+  const PLUGIN_REPO_ADDRESS = '0x103003ebe544a4a6b520cc586e4740f8540613a2'
   const UNISWAP_ROUTER_ADDRESS: string = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
   const data = abiCoder.encode(metadata.pluginSetupABI.prepareInstallation, [
