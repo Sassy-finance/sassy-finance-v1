@@ -8,6 +8,7 @@ import {OverviewDAOHeader, OverviewDAOStep} from 'containers/daoOverview';
 import SelectChain from 'containers/selectChainForm';
 import DefineMetadata from 'containers/defineMetadata';
 import ConfigureCommunity from 'containers/configureCommunity';
+import ConfigurePlugins from 'containers/configurePlugins';
 import SetupCommunity from 'containers/setupCommunity';
 import GoLive, {GoLiveHeader, GoLiveFooter} from 'containers/goLive';
 import {WalletField} from '../components/addWallets/row';
@@ -325,6 +326,23 @@ const CreateDAO: React.FC = () => {
             }
           >
             <ConfigureCommunity />
+          </Step>
+          <Step
+            wizardTitle={'Configure plugins'}
+            wizardDescription={'Select the plugins to install in your DAO'}
+            isNextButtonDisabled={false}
+            onNextButtonClicked={next =>
+              handleNextButtonTracking(next, '4_configure_governance', {
+                minimum_approval: formMethods.getValues('minimumApproval'),
+                support: formMethods.getValues('support'),
+                duration_days: formMethods.getValues('durationDays'),
+                duration_hours: formMethods.getValues('durationHours'),
+                duration_minutes: formMethods.getValues('durationMinutes'),
+                governance_type: formMethods.getValues('membership'),
+              })
+            }
+          >
+            <ConfigurePlugins />
           </Step>
           <Step
             hideWizard
