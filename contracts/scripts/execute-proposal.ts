@@ -16,7 +16,7 @@ async function main() {
 
 
   try {
-    const tx = await  tokenPluginContract.execute(19);
+    const tx = await  tokenPluginContract.execute(20);
     const receipt = await tx.wait();
     console.log(receipt);
   } catch (error) {
