@@ -6,11 +6,9 @@ import { useNavigate, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
 import { Loading } from 'components/temporary/loading';
 import TokenList from 'components/tokenList';
-import TransferList from 'components/transferList';
 import {
   PageWrapper,
   TokenSectionWrapper,
-  TransferSectionWrapper,
 } from 'components/wrappers';
 import { useGlobalModalContext } from 'context/globalModals';
 import { useTransactionDetailContext } from 'context/transactionDetail';
@@ -20,7 +18,7 @@ import { useMappedBreadcrumbs } from 'hooks/useMappedBreadcrumbs';
 import useScreen from 'hooks/useScreen';
 import { trackEvent } from 'services/analytics';
 import { sortTokens } from 'utils/tokens';
-import { Swap } from 'utils/paths'
+import { BuyNFT, Swap } from 'utils/paths'
 import { useNetwork } from 'context/network';
 
 type Sign = -1 | 0 | 1;
@@ -30,7 +28,7 @@ const colors: Record<Sign, string> = {
   '0': 'text-ui-600',
 };
 
-const Strategy: React.FC = () => {
+const StrategyNFT: React.FC = () => {
   const { t } = useTranslation();
   const { open } = useGlobalModalContext();
   const { isDesktop } = useScreen();
@@ -106,14 +104,14 @@ const Strategy: React.FC = () => {
               />
               <ButtonText
                 size="large"
-                label={'Swap assets'}
+                label={'Buy NFT'}
                 iconLeft={<IconAdd />}
                 className="w-full tablet:w-auto"
                 onClick={() => {
                   trackEvent('finance_newTransferBtn_clicked', {
                     dao_address: daoId,
                   });
-                  navigate(generatePath(Swap, { network, dao: daoId }));
+                  navigate(generatePath(BuyNFT, { network, dao: daoId }));
                 }}
               />
             </ContentContainer>
@@ -132,7 +130,7 @@ const Strategy: React.FC = () => {
   );
 };
 
-export default withTransaction('Strategy', 'component')(Strategy);
+export default withTransaction('StrategyNFT', 'component')(StrategyNFT);
 
 const ListContainer = styled.div.attrs({
   className: 'py-2 space-y-2',

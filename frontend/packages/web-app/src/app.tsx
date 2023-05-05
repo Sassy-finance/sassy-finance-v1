@@ -56,6 +56,7 @@ const NewDepositPage = lazy(() => import('pages/newDeposit'));
 const NewWithdrawPage = lazy(() => import('pages/newWithdraw'));
 const NewStrategyPage = lazy(() => import('pages/newStrategy'));
 const StrategyPage = lazy(() => import('pages/strategy'));
+const StrategyNFTPage = lazy(() => import('pages/strategyNFT'));
 const Swap = lazy(() => import('pages/swapTokens'));
 const BuyNFT = lazy(() => import('pages/buyNFT'));
 
@@ -122,8 +123,12 @@ function App() {
                   element={<NewStrategyPage />}
                 />
                 <Route
-                  path="finance/strategy/:id"
+                  path="finance/strategy/erc20/:id"
                   element={<StrategyPage />}
+                />
+                <Route
+                  path="finance/strategy/nft/:id"
+                  element={<StrategyNFTPage />}
                 />
                 <Route
                   path="finance/swap"

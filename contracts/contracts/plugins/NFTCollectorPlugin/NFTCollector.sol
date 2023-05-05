@@ -28,14 +28,14 @@ contract NFTCollector is PluginUUPSUpgradeable {
         Order calldata order,
         bytes32 fulfillerConduitKey,
         uint256 _value
-    ) external payable returns (bool fulfilled) {
+    ) external payable auth(NFT_COLLECTOR_PERMISSION_ID) returns (bool fulfilled) {
         return seaport.fulfillOrder{value: _value}(order, fulfillerConduitKey);
     }
 
     function fulfillBasicOrder(
         BasicOrderParameters calldata parameters,
         uint256 _value
-    ) external payable returns (bool fulfilled) {
+    ) external payable auth(NFT_COLLECTOR_PERMISSION_ID) returns (bool fulfilled) {
         return seaport.fulfillBasicOrder{value: _value}(parameters);
     }
 

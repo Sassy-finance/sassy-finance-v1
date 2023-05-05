@@ -16,9 +16,8 @@ async function main() {
 
 
   try {
-    const tx = await  tokenPluginContract.execute(20);
+    const tx = await  tokenPluginContract.execute(3);
     const receipt = await tx.wait();
-    console.log(receipt);
   } catch (error) {
     if (error.code === 'TRANSACTION_REVERTED') {
       console.error(`Transaction reverted with reason: ${error.receipt.transactionRevertReason}`);

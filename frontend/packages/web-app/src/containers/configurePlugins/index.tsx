@@ -60,7 +60,7 @@ const ConfigurePlugins: React.FC = () => {
           {/* Group voting */}
           <FormItem>
             <Label
-              label={'Group voting plugin'}
+              label={'Sub-governance groups'}
               helpText={'This plugin enables the creation of sub governance groups within an existing DAO. This plugin remove the need to create a new DAO, allowing an organisation to jointly vote for the creation of this subgroup that has its own budget from the join treasury and own decision making rules.'}
             />
             <Controller
@@ -80,7 +80,7 @@ const ConfigurePlugins: React.FC = () => {
           {/* Swap tokens */}
           <FormItem>
             <Label
-              label={'Swap tokens plugin'}
+              label={'Uniswap plugin'}
               helpText={'This plugin enables the group to grant access to users to trade groups treasury directly using Uniswap.'}
             />
             <Controller

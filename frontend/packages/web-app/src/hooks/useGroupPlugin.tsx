@@ -12,7 +12,7 @@ export interface IUseGroupPlugin {
 
 
 export const useGroupPlugin = (): IUseGroupPlugin => {
-  const pluginAddress = '0xB231162ab49971EB44bfC8245b1Bf68ad6e333dF'
+  const pluginAddress = '0x4451b68aA935DBA54Fa98Ba618456d41F2915F3f'
   const tokenAddress = '0xe9DcE89B076BA6107Bb64EF30678efec11939234'
 
   const {

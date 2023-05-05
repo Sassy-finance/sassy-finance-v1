@@ -31,7 +31,7 @@ async function main() {
     signers[0]
   )
 
-  const prepareTx = "0x36e8cc24239e2e7dc0d5d0875c74e626d538c99f082e84c190c4e7aae391a33b"
+  const prepareTx = "0xb34fca8f384589602cff75c2ec30959f08d158344e0ec4069bf38b6441dfbb94"
   const txApply = await ethers.provider.getTransactionReceipt(prepareTx)
   const logs = txApply.logs
     .filter(log => log.address == PLUGIN_SETUP_PROCESSOR_ADDRESS)
