@@ -16,7 +16,7 @@ export interface IUseGroupPlugin {
 
 
 export const useSwapPlugin = (vaultAddress: string): IUseGroupPlugin => {
-  const pluginAddress = '0xB231162ab49971EB44bfC8245b1Bf68ad6e333dF'
+  const pluginAddress = '0x4451b68aA935DBA54Fa98Ba618456d41F2915F3f'
 
   const {
     provider: signerProvider,

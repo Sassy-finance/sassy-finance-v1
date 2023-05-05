@@ -27,7 +27,7 @@ const strategyMenu: React.FC = () => {
     } else if (action === 'manual_strategy') {
       navigate(generatePath(NewStrategy, {network: network, dao: dao}));
     } else {
-      navigate(generatePath(NewWithDraw, {network: network, dao: dao}));
+      navigate(generatePath(NewStrategy, {network: network, dao: dao}));
     }
     close('strategy');
   };
@@ -49,10 +49,10 @@ const strategyMenu: React.FC = () => {
           title={t('StrategyModal.item2Title') as string}
           subtitle={t('StrategyModal.item2Subtitle') as string}
           iconRight={<IconChevronRight />}
-          onClick={() => handleClick('nft_strategy')}
+          onClick={() => handleClick('manual_strategy')}
         />
       </Container>
-    </ModalBottomSheetSwitcher>
+    </ModalBottomSheetSwitcher> 
   );
 };
 

@@ -18,7 +18,8 @@ export const AllTransfers = '/daos/:network/:dao/finance/transfers';
 export const NewDeposit = '/daos/:network/:dao/finance/new-deposit';
 export const NewWithDraw = '/daos/:network/:dao/finance/new-withdrawal';
 export const NewStrategy = '/daos/:network/:dao/finance/new-strategy';
-export const Strategy = '/daos/:network/:dao/finance/strategy/:id';
+export const Strategy = '/daos/:network/:dao/finance/strategy/erc20/:id';
+export const StrategyNFT = '/daos/:network/:dao/finance/strategy/nft/:id';
 export const Swap = '/daos/:network/:dao/finance/swap';
 export const BuyNFT = '/daos/:network/:dao/finance/buy-nft';
 

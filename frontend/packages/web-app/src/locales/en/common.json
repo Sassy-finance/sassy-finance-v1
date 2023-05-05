@@ -472,7 +472,7 @@
     "item1Title": "Manage assets",
     "item1Subtitle": "Create a manual asset strategy",
     "item2Title": "NFT assets",
-    "item2Subtitle": "Create a automatic NFT collector"
+    "item2Subtitle": "Create a NFT collector strategy"
   },
   "TokenModal": {
     "noTokens": "No tokens available",
