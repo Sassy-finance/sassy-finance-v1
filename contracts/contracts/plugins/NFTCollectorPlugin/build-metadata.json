@@ -1,0 +1,11 @@
+{
+    "ui": "",
+    "change": "",
+    "pluginSetupABI": {
+      "prepareInstallation": [
+        "address seaport"
+      ],
+      "prepareUpdate": [""],
+      "prepareUninstallation": [""]
+    }
+  }
