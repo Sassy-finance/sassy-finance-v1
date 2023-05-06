@@ -119,22 +119,22 @@ describe('Swap tokens plugin', function () {
             const wmatic = ERC20.attach(WMATIC_ADDRESS)
             const wether = ERC20.attach(WETHER_ADDRESS)
 
-            // await wmatic.connect(impersonatedSigner).transfer(
-            //     swapToken.address, ethers.utils.parseEther('0.5')
-            // )
+            await wmatic.connect(impersonatedSigner).transfer(
+                swapToken.address, ethers.utils.parseEther('0.5')
+            )
 
             const balanceBefore = await wether.balanceOf(signers[1].address)
 
-            // await swapToken.connect(signers[1]).swapTokens(
-            //     WMATIC_ADDRESS,
-            //     ethers.utils.parseEther('0.5'),
-            //     WETHER_ADDRESS,
-            //     signers[1].address)
+            await swapToken.connect(signers[1]).swapTokens(
+                WMATIC_ADDRESS,
+                ethers.utils.parseEther('0.5'),
+                WETHER_ADDRESS,
+                signers[1].address)
 
-            // const balanceAfter = await wether.balanceOf(signers[1].address)
+            const balanceAfter = await wether.balanceOf(signers[1].address)
 
-            // expect(balanceBefore.toNumber()).to.be.equals(0)
-            // expect(balanceAfter.toNumber()).to.be.greaterThan(0)
+            expect(balanceBefore.toNumber()).to.be.equals(0)
+            expect(balanceAfter.toNumber()).to.be.greaterThan(0)
 
         });
 
@@ -147,27 +147,27 @@ describe('Swap tokens plugin', function () {
             const wmatic = ERC20.attach(WMATIC_ADDRESS)
             const wether = ERC20.attach(WETHER_ADDRESS)
 
-            // await wmatic.connect(impersonatedSigner).transfer(
-            //     dao.address, ethers.utils.parseEther('0.5')
-            // )
+            await wmatic.connect(impersonatedSigner).transfer(
+                dao.address, ethers.utils.parseEther('0.5')
+            )
 
-            // await swapToken.connect(signers[1]).withdrawFromTreasury(
-            //     WMATIC_ADDRESS,
-            //     ethers.utils.parseEther('0.5')
-            // )
+            await swapToken.connect(signers[1]).withdrawFromTreasury(
+                WMATIC_ADDRESS,
+                ethers.utils.parseEther('0.5')
+            )
 
             const balanceBefore = await wether.balanceOf(dao.address)
 
-            // await swapToken.connect(signers[1]).swapTokens(
-            //     WMATIC_ADDRESS,
-            //     ethers.utils.parseEther('0.5'),
-            //     WETHER_ADDRESS,
-            //     dao.address)
+            await swapToken.connect(signers[1]).swapTokens(
+                WMATIC_ADDRESS,
+                ethers.utils.parseEther('0.5'),
+                WETHER_ADDRESS,
+                dao.address)
 
-            // const balanceAfter = await wether.balanceOf(dao.address)
+            const balanceAfter = await wether.balanceOf(dao.address)
 
-            // expect(balanceBefore.toNumber()).to.be.equals(0)
-            // expect(balanceAfter.toNumber()).to.be.greaterThan(0)
+            expect(balanceBefore.toNumber()).to.be.equals(0)
+            expect(balanceAfter.toNumber()).to.be.greaterThan(0)
 
         });
 
