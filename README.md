@@ -1,6 +1,8 @@
 # Sassy finance
 This repository contains our project for the DAO global hackathon. It implements a Dapp where users can create their DeFi DAO in one single clicks, selecting the plugins needed for their use case.
 
+The application is deployed at: https://www.sassyfinance.xyz/
+
 ## Components
 
 This repository has two components:
