@@ -65,7 +65,7 @@ const SelectChainForm: React.FC = () => {
     <>
       <Header>
         <NetworkTypeSwitcher>
-          <ButtonText
+          {/* <ButtonText
             mode="ghost"
             bgWhite
             size={isMobile ? 'small' : 'medium'}
@@ -74,7 +74,7 @@ const SelectChainForm: React.FC = () => {
             onClick={() => {
               setNetworkType('main');
             }}
-          />
+          /> */}
           <ButtonText
             mode="ghost"
             bgWhite
