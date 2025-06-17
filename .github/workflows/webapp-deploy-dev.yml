@@ -76,6 +76,11 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+
+      - name: Authenticate Docker to Google Artifact Registry
+        run: |-
+          gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+
       - name: Build and push Frontend Docker image (versioned)
         id: build-push-frontend-release
         uses: docker/build-push-action@v5
