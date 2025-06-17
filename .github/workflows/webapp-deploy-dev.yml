@@ -1,10 +1,7 @@
-name: WebApp Deploy DEV (no Fleek)
+name: WebApp Deploy
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'frontend/packages/web-app/**'
-      - '!.github/**'
     branches:
       - 'main'
 
@@ -69,46 +66,34 @@ jobs:
           VITE_ALCHEMY_KEY_POLYGON_MUMBAI: ${{ secrets.VITE_ALCHEMY_KEY_POLYGON_MUMBAI }}
           NODE_OPTIONS: '--max-old-space-size=6656'
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
-      - name: Get Git hash and Timestamp in seconds
-        id: vars
-        run: |
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-' )" >> $GITHUB_OUTPUT
-          echo "GIT_HASH_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "DATE_IN_SECS=$(date +%s)" >> $GITHUB_OUTPUT
-
-      - name: Set swap space on Runner
-        uses: pierotofy/set-swap-space@master
+      - name: Install the gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          swap-size-gb: 12
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      ## Use this step instead of `docker/build-push-action@v4` to avoid JavaScript heap out memory error
-      ## Using 'docker buildx build ...' allows controlling memory and memory-swap
-      ## https://developer.ibm.com/articles/nodejs-memory-management-in-container-environments/
-      ## https://docs.docker.com/engine/reference/commandline/buildx_build/#build-arg
-      - name: Build Docker image from scratch
-        working-directory: frontend
-        run: |
-          mkdir -p /tmp/docker-build-push-${{ steps.vars.outputs.DATE_IN_SECS }}/
-          docker buildx build . --file ./Dockerfile.webapp.dev --push \
-          --build-arg NODE_OPTIONS='--max-old-space-size=6656' \
-          --tag ialberquilla/sassy-frontend
-
-
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Build and push Frontend Docker image (versioned)
+        id: build-push-frontend-release
+        uses: docker/build-push-action@v5
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          push: true
+          context: ./frontend
+          tags: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPO_NAME }}/sassy-frontend:${{ steps.extract-frontend-version.outputs.VERSION }}
+          build-args: |
+            VITE_REACT_APP_DEPLOY_VERSION=${{ github.sha }} \
+            VITE_REACT_APP_DEPLOY_ENVIRONMENT=${{ needs.setup-env-vars.outputs.environment }} \
+            VITE_REACT_APP_ANALYTICS_KEY=${{ secrets.VITE_REACT_APP_ANALYTICS_KEY }} \
+            VITE_IPFS_API_KEY=${{ secrets.VITE_IPFS_API_KEY }} \
+            VITE_ETHERSCAN_API_KEY=${{ secrets.VITE_ETHERSCAN_API_KEY }} \
+            VITE_INFURA_GOERLI_PROJECT_ID=${{ secrets.VITE_INFURA_GOERLI_PROJECT_ID }} \
+            VITE_INFURA_MAINNET_PROJECT_ID=${{ secrets.VITE_INFURA_MAINNET_PROJECT_ID }} \
+            VITE_ALCHEMY_KEY_POLYGON_MAINNET=${{ secrets.VITE_ALCHEMY_KEY_POLYGON_MAINNET }} \
+            VITE_ALCHEMY_KEY_POLYGON_MUMBAI=${{ secrets.VITE_ALCHEMY_KEY_POLYGON_MUMBAI }}
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6656'
 
-
-      - name: Restart APP
-        run: doctl apps create-deployment 77c26f54-f5fd-4648-a868-ad983110c654
 
