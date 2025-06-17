@@ -82,7 +82,7 @@ jobs:
         with:
           push: true
           context: ./frontend
-          tags: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPO_NAME }}/sassy-frontend:${{ steps.extract-frontend-version.outputs.VERSION }}
+          tags: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPO_NAME }}/sassy-frontend:latest
           build-args: |
             VITE_REACT_APP_DEPLOY_VERSION=${{ github.sha }} \
             VITE_REACT_APP_DEPLOY_ENVIRONMENT=${{ needs.setup-env-vars.outputs.environment }} \
